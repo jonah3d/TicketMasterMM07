@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TM_Model", "TM_Model\TM_Model.csproj", "{4E4A010D-21AA-4723-A4D5-0287D67A8341}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TM_Database", "TM_Database\TM_Database.csproj", "{E547BE4B-0355-4152-A68D-2AC4CA9FD276}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TM_View", "TM_View\TM_View.csproj", "{D50F2CCB-2AF4-4187-8355-64E87A9DB9C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E4A010D-21AA-4723-A4D5-0287D67A8341}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E4A010D-21AA-4723-A4D5-0287D67A8341}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E4A010D-21AA-4723-A4D5-0287D67A8341}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E4A010D-21AA-4723-A4D5-0287D67A8341}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E547BE4B-0355-4152-A68D-2AC4CA9FD276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E547BE4B-0355-4152-A68D-2AC4CA9FD276}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E547BE4B-0355-4152-A68D-2AC4CA9FD276}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E547BE4B-0355-4152-A68D-2AC4CA9FD276}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D50F2CCB-2AF4-4187-8355-64E87A9DB9C9}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{D50F2CCB-2AF4-4187-8355-64E87A9DB9C9}.Debug|Any CPU.Build.0 = Debug|x64
+		{D50F2CCB-2AF4-4187-8355-64E87A9DB9C9}.Debug|Any CPU.Deploy.0 = Debug|x64
+		{D50F2CCB-2AF4-4187-8355-64E87A9DB9C9}.Release|Any CPU.ActiveCfg = Release|x64
+		{D50F2CCB-2AF4-4187-8355-64E87A9DB9C9}.Release|Any CPU.Build.0 = Release|x64
+		{D50F2CCB-2AF4-4187-8355-64E87A9DB9C9}.Release|Any CPU.Deploy.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

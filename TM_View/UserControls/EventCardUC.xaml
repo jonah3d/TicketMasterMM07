@@ -1,0 +1,36 @@
+﻿<UserControl
+    x:Class="TM_View.UserControls.EventCardUC"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TM_View.UserControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+
+        <Image x:Name="EventImage" Stretch="UniformToFill"/>
+
+
+        <Rectangle VerticalAlignment="Bottom" Height="80">
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                    <GradientStop Color="Transparent" Offset="0.0"/>
+                    <GradientStop Color="Black" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+
+        <StackPanel VerticalAlignment="Bottom" Padding="10" Margin="0,0,0,10">
+            <TextBlock x:Name="EventTitle" Text="Event Title"
+                    Foreground="White" FontSize="18"
+                    FontWeight="Bold" TextWrapping="Wrap"/>
+            <Border Background="Green" Padding="5" HorizontalAlignment="Left" CornerRadius="5">
+                <TextBlock x:Name="EventStatus" Text="Status" Foreground="White" FontSize="14"/>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>
