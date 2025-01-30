@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <!-- 
+ 
     <ScrollViewer>
         <Grid x:Name="HomePageGrid">
             <Grid.RowDefinitions>
@@ -28,11 +28,14 @@
                 <TextBlock Text="Music Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
 
 
-                <GridView ItemsSource="{Binding musicEvents}" Height="300">
+                <GridView ItemsSource="{Binding musicEvents}" Height="300" Width="1800">
                     <GridView.ItemTemplate>
                         <DataTemplate>
 
-                            <local1:EventCardUC Title="{Binding nom}" Status="{Binding estat}" ImagePath="{Binding imatgePath}" />
+                            <local1:EventCardUC Title="{Binding Nom}" Status="{Binding Status}" ImagePath="{Binding ImatgePath}"
+                                
+                                />
+
                         </DataTemplate>
                     </GridView.ItemTemplate>
                 </GridView>
@@ -41,7 +44,9 @@
 
         </Grid>
     </ScrollViewer>
-    -->
+
+    
+    <!-- 
     <ListView ItemsSource="{Binding musicEvents}" Margin="0,0,0,0">
         <ListView.ItemTemplate>
             <DataTemplate>
@@ -50,6 +55,7 @@
         </ListView.ItemTemplate>
 
     </ListView>
+    -->
         
 
       

@@ -16,7 +16,7 @@ namespace TM_Model
         public TimeSpan Time { get; set; }
         public List<Tarifa> Tarifes { get; set; }
         public Sala Sala { get; set; }
-        public Estat Estat { get; set; }
+        public Estat Status { get; set; }
         public TipusEvent Tipus { get; set; }
 
         public Event() { }
@@ -33,7 +33,7 @@ namespace TM_Model
             Time = time;
             Tipus = tipusEvent;
             Sala = sala;
-            Estat = estat;
+            Status = estat;
             Tarifes = new List<Tarifa>();
         }
     }

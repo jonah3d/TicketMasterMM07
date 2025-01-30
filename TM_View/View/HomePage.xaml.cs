@@ -38,6 +38,7 @@ namespace TM_View.View
                 context = new MySQLDBContext();
                 eventRepository = new EventRepository(context);
                 LoadMusicEvents();
+                this.DataContext = this;
             }
             catch (Exception ex)
             {
@@ -50,7 +51,7 @@ namespace TM_View.View
             try
             {
                 musicEvents = eventRepository.GetAllMusicEvent();
-                this.DataContext = this;
+              
             }
             catch (Exception ex)
             {
