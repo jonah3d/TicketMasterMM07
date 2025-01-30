@@ -4,15 +4,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TM_View.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local1="using:TM_View.UserControls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+    <!-- 
     <ScrollViewer>
         <Grid x:Name="HomePageGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="*"/>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="1*"/>
@@ -23,7 +24,33 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <TextBlock Text="Music Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
+
+
+                <GridView ItemsSource="{Binding musicEvents}" Height="300">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+
+                            <local1:EventCardUC Title="{Binding nom}" Status="{Binding estat}" ImagePath="{Binding imatgePath}" />
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+   
 
         </Grid>
     </ScrollViewer>
+    -->
+    <ListView ItemsSource="{Binding musicEvents}" Margin="0,0,0,0">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{Binding Nom}" Margin="0,5,0,5"/>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+
+    </ListView>
+        
+
+      
 </Page>

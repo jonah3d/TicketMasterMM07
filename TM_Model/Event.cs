@@ -3,22 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace TM_Model
 {
     public class Event
     {
-        private TipusEvent tipus;
-        private long id;
-        private String nom;
-        private String protagonista;
-        private string imatgePath;
-        private string desc;
-        private DateTime data;
-        private DateTime time;
-        private List<Tarifa> tarifes;
-        private Sala sala;
-        private Estat estat;
-        private string location;
+        public long Id { get; set; }
+        public string Nom { get; set; }
+        public string Protagonista { get; set; }
+        public string ImatgePath { get; set; }
+        public string Desc { get; set; }
+        public DateTime Data { get; set; }
+        public TimeSpan Time { get; set; }
+        public List<Tarifa> Tarifes { get; set; }
+        public Sala Sala { get; set; }
+        public Estat Estat { get; set; }
+        public TipusEvent Tipus { get; set; }
+
+        public Event() { }
+
+        public Event(long id, string nom, string desc, string protagonista, string imatgePath,
+                    DateTime data, TimeSpan time, TipusEvent tipusEvent, Sala sala, Estat estat)
+        {
+            Id = id;
+            Nom = nom;
+            Protagonista = protagonista;
+            ImatgePath = imatgePath;
+            Desc = desc;
+            Data = data;
+            Time = time;
+            Tipus = tipusEvent;
+            Sala = sala;
+            Estat = estat;
+            Tarifes = new List<Tarifa>();
+        }
     }
 }

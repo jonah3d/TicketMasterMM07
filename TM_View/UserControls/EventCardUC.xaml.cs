@@ -38,7 +38,19 @@ namespace TM_View.UserControls
 
         public string ImagePath
         {
-            set => EventImage.Source = new BitmapImage(new System.Uri("ms-appx:///" + value));
+            set
+            {
+              
+                if (Uri.IsWellFormedUriString(value, UriKind.Absolute))
+                {
+                    EventImage.Source = new BitmapImage(new Uri(value)); 
+                }
+                else
+                {
+                  
+                    EventImage.Source = null;
+                }
+            }
         }
     }
 }

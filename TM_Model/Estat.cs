@@ -8,8 +8,10 @@ namespace TM_Model
 {
     public enum Estat
     {
-        NOU,
-        PUBLICAT,
-        ARXIVAT
+        NEW,
+        PUBLISHED,
+        IN_PROGRESS,
+        COMPLETED
     }
+
 }

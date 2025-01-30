@@ -8,10 +8,15 @@ namespace TM_Model
 {
     public enum TipusEvent
     {
-        MUSICA,
-        TEATRE,
-        ESPORT,
+        MUSIC,
+        THEATER,
+        SPORTS,
         CINEMA,
-        ALTRES
+        FAMILY,
+        ARTS,
+        OTHER
+
+
     }
 }
+

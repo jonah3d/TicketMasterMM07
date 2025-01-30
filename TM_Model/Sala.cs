@@ -16,5 +16,12 @@ namespace TM_Model
         private bool teMapa;
         private int numFiles;
         private int numColumnes;
+
+        public Sala(string nom)
+        {
+            this.nom = nom;
+        }
     }
-}
+
+  
+    }
