@@ -12,5 +12,6 @@ namespace TM_Database.Repository
 
         ObservableCollection<Event> GetAllEvents();
         ObservableCollection<Event> GetAllMusicEvent();
+        ObservableCollection<Sala> GetAllSalas();
     }
 }

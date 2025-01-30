@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
- 
+    <!--
     <ScrollViewer>
         <Grid x:Name="HomePageGrid">
             <Grid.RowDefinitions>
@@ -43,10 +43,10 @@
    
 
         </Grid>
-    </ScrollViewer>
+    </ScrollViewer> -->
+
 
     
-    <!-- 
     <ListView ItemsSource="{Binding musicEvents}" Margin="0,0,0,0">
         <ListView.ItemTemplate>
             <DataTemplate>
@@ -55,7 +55,7 @@
         </ListView.ItemTemplate>
 
     </ListView>
-    -->
+  
         
 
       

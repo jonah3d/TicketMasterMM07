@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
@@ -10,13 +11,13 @@ namespace TM_Database.Repository
 {
     public class EventRepository : IEventRepository
     {
-        private readonly MySQLDBContext context;
+    
+        private DbConnection dBconnection;
 
-        public EventRepository(MySQLDBContext context)
+        public EventRepository(DbConnection connection)
         {
-            this.context = context;
 
-            
+            this.dBconnection = connection;
         }
 
         public ObservableCollection<Event> GetAllEvents()
@@ -27,14 +28,8 @@ namespace TM_Database.Repository
         public ObservableCollection<Event> GetAllMusicEvent()
         {
             ObservableCollection<Event> events = new ObservableCollection<Event>();
-
-            var connection = context.Database.GetDbConnection();
-
-           if(connection.State != System.Data.ConnectionState.Open)
-            {
-                connection.Open();
-            }
-            var consulta = connection.CreateCommand();
+      
+            var consulta = dBconnection.CreateCommand();
             consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
@@ -70,5 +65,30 @@ namespace TM_Database.Repository
             return events;
         }
 
+    
+
+        ObservableCollection<Sala> IEventRepository.GetAllSalas()
+        {
+           ObservableCollection<Sala> salas = new ObservableCollection<Sala>();
+            var consulta = dBconnection.CreateCommand();
+            consulta.CommandText = @"select Sal_Id, Sal_Name, Sal_Municipality, Sal_Address, Sal_MapAvail,
+                                        Sal_Seats, Sal_Rows, Sal_Col from sala";
+            var reader = consulta.ExecuteReader();
+            while (reader.Read())
+            {
+                long id = reader.GetInt64(reader.GetOrdinal("Sal_Id"));
+                string nom = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                string municipio = reader.GetString(reader.GetOrdinal("Sal_Municipality"));
+                string address = reader.GetString(reader.GetOrdinal("Sal_Address"));
+                bool mapAvail = reader.GetBoolean(reader.GetOrdinal("Sal_MapAvail"));
+                int seats = reader.GetInt32(reader.GetOrdinal("Sal_Seats"));
+                int rows = reader.GetInt32(reader.GetOrdinal("Sal_Rows"));
+                int col = reader.GetInt32(reader.GetOrdinal("Sal_Col"));
+                Sala s = new Sala(id,nom,municipio,address,mapAvail,seats,rows,col);
+                salas.Add(s);
+            }
+            return salas;
+        }
     }
 }
+

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -20,7 +21,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace TM_View.View
 {
@@ -28,6 +28,7 @@ namespace TM_View.View
     {
         private IEventRepository eventRepository;
         private MySQLDBContext context;
+        private DbConnection dBconnection;
         public ObservableCollection<Event> musicEvents { get; set; } = new ObservableCollection<Event>();
 
         public HomePage()
@@ -36,7 +37,24 @@ namespace TM_View.View
             try
             {
                 context = new MySQLDBContext();
-                eventRepository = new EventRepository(context);
+                dBconnection = context.Database.GetDbConnection();
+
+                dBconnection.Open();
+                if (dBconnection.State == System.Data.ConnectionState.Open)
+                {
+                    eventRepository = new EventRepository(dBconnection);
+                }
+                else
+                {
+                    ContentDialog errorDialog = new ContentDialog
+                    {
+                        Title = "Connection error",
+                        Content = "Failed to connect to the database",
+                        CloseButtonText = "Ok"
+                    };
+                }
+
+
                 LoadMusicEvents();
                 this.DataContext = this;
             }
