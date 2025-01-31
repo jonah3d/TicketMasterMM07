@@ -55,6 +55,8 @@
                 <ComboBox  Width="200" Margin="25,0,0,0" x:Name="cmb_sala" DisplayMemberPath="Nom">
                     
                 </ComboBox>
+
+               
             </StackPanel>
             
         </StackPanel>

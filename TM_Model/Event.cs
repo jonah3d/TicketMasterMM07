@@ -11,6 +11,8 @@ namespace TM_Model
         public string Nom { get; set; }
         public string Protagonista { get; set; }
         public string ImatgePath { get; set; }
+
+
         public string Desc { get; set; }
         public DateTime Data { get; set; }
         public TimeSpan Time { get; set; }

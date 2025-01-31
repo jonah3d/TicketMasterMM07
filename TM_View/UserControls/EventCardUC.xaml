@@ -7,11 +7,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
-    d:DesignWidth="400">
+    d:DesignWidth="400" 
+    x:Name="ucRoot">
 
-    <Grid>
+    <Grid Height="200" Width="200">
 
-        <Image x:Name="EventImage" Stretch="UniformToFill"/>
+        <Image x:Name="EventImage" Stretch="UniformToFill" Source="{Binding ElementName=ucRoot, Path=TheEvent.ImatgePath}"/>
 
 
         <Rectangle VerticalAlignment="Bottom" Height="80">
@@ -25,11 +26,11 @@
 
 
         <StackPanel VerticalAlignment="Bottom" Padding="10" Margin="0,0,0,10">
-            <TextBlock x:Name="EventTitle" Text="Event Title"
+            <TextBlock x:Name="EventTitle" Text="{Binding ElementName=ucRoot, Path=TheEvent.Nom}"
                     Foreground="White" FontSize="18"
                     FontWeight="Bold" TextWrapping="Wrap"/>
             <Border Background="Green" Padding="5" HorizontalAlignment="Left" CornerRadius="5">
-                <TextBlock x:Name="EventStatus" Text="Status" Foreground="White" FontSize="14"/>
+                <TextBlock x:Name="EventStatus" Text="{Binding ElementName=ucRoot, Path=TheEvent.Status}" Foreground="White" FontSize="14"/>
             </Border>
         </StackPanel>
     </Grid>

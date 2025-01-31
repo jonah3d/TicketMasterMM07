@@ -8,53 +8,114 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <!--
+    
     <ScrollViewer>
         <Grid x:Name="HomePageGrid">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="1*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="1" Orientation="Vertical">
+            <StackPanel Grid.Row="0" Orientation="Vertical">
                 <TextBlock Text="Music Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
-
-
-                <GridView ItemsSource="{Binding musicEvents}" Height="300" Width="1800">
+                <GridView ItemsSource="{Binding musicEvents}" Height="500" Width="1900">
                     <GridView.ItemTemplate>
                         <DataTemplate>
-
-                            <local1:EventCardUC Title="{Binding Nom}" Status="{Binding Status}" ImagePath="{Binding ImatgePath}"
-                                
-                                />
-
+                            <local1:EventCardUC TheEvent="{Binding}"/>
                         </DataTemplate>
                     </GridView.ItemTemplate>
                 </GridView>
             </StackPanel>
-   
+
+            <StackPanel Grid.Row="1" Orientation="Vertical">
+                <TextBlock Text="Sporting Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
+                <GridView ItemsSource="{Binding sportsEvents}" Height="500" Width="1900">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <local1:EventCardUC TheEvent="{Binding}"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Vertical">
+                <TextBlock Text="Theatre Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
+                <GridView ItemsSource="{Binding theatreEvents}" Height="500" Width="1900">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <local1:EventCardUC TheEvent="{Binding}"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Orientation="Vertical">
+                <TextBlock Text="Cinema Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
+                <GridView ItemsSource="{Binding cinemaEvents}" Height="500" Width="1900">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <local1:EventCardUC TheEvent="{Binding}"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+
+            <StackPanel Grid.Row="4" Orientation="Vertical">
+                <TextBlock Text="Family Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
+                <GridView ItemsSource="{Binding familyEvents}" Height="500" Width="1900">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <local1:EventCardUC TheEvent="{Binding}"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+
+            <StackPanel Grid.Row="5" Orientation="Vertical">
+                <TextBlock Text="Arts Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
+                <GridView ItemsSource="{Binding artsEvents}" Height="500" Width="1900">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <local1:EventCardUC TheEvent="{Binding}"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+
+            <StackPanel Grid.Row="6" Orientation="Vertical">
+                <TextBlock Text="Other Events" FontSize="36" FontWeight="Bold" Margin="0,0,10,0"/>
+                <GridView ItemsSource="{Binding otherEvents}" Height="500" Width="1900">
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <local1:EventCardUC TheEvent="{Binding}"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
 
         </Grid>
-    </ScrollViewer> -->
+    </ScrollViewer> 
 
 
     
-    <ListView ItemsSource="{Binding musicEvents}" Margin="0,0,0,0">
+    
+    <!--<ListView ItemsSource="{Binding musicEvents}" Margin="0,0,0,0">
         <ListView.ItemTemplate>
             <DataTemplate>
                 <TextBlock Text="{Binding Nom}" Margin="0,5,0,5"/>
             </DataTemplate>
         </ListView.ItemTemplate>
 
-    </ListView>
+    </ListView>-->
   
         
 

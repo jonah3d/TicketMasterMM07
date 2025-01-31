@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -42,7 +43,7 @@ namespace TM_View.View
             dBconnection.Open();
             if (dBconnection.State == System.Data.ConnectionState.Open)
             {
-                eventRepository = new EventRepository(dBconnection);
+                eventRepository = new EventRepository();
             }
             else
             {
@@ -58,6 +59,7 @@ namespace TM_View.View
             cmb_type.ItemsSource = Enum.GetValues(typeof(TipusEvent));
            cmb_sala.ItemsSource = salas;
             loadSalas();
+           
             this.DataContext = this;
         }
 
@@ -66,6 +68,7 @@ namespace TM_View.View
             try
             {
                 var retrievedSalas = eventRepository.GetAllSalas();
+                Debug.WriteLine($"Retrieved {salas.Count} salas");
                 salas.Clear(); 
                 foreach (var sala in retrievedSalas)
                 {
