@@ -21,7 +21,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace TM_View.View
 {
@@ -37,28 +36,14 @@ namespace TM_View.View
         {
             this.InitializeComponent();
 
-            context = new MySQLDBContext();
-            dBconnection = context.Database.GetDbConnection();
+          
+              eventRepository = new EventRepository();
+           
 
-            dBconnection.Open();
-            if (dBconnection.State == System.Data.ConnectionState.Open)
-            {
-                eventRepository = new EventRepository();
-            }
-            else
-            {
-                ContentDialog errorDialog = new ContentDialog
-                {
-                    Title = "Connection error",
-                    Content = "Failed to connect to the database",
-                    CloseButtonText = "Ok"
-                };
-            }
-
-            cmb_status.ItemsSource = Enum.GetValues(typeof(Estat));
-            cmb_type.ItemsSource = Enum.GetValues(typeof(TipusEvent));
+           cmb_status.ItemsSource = Enum.GetValues(typeof(Estat));
+           cmb_type.ItemsSource = Enum.GetValues(typeof(TipusEvent));
            cmb_sala.ItemsSource = salas;
-            loadSalas();
+           loadSalas();
            
             this.DataContext = this;
         }
@@ -81,5 +66,15 @@ namespace TM_View.View
             }
         }
 
+        private void btn_EvtImgSelector_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog dialog = new ContentDialog
+            {
+                Title = "Select an image",
+                Content = "Choose an image from your computer",
+                PrimaryButtonText = "Select",
+                CloseButtonText = "Cancel"
+            };
+        }
     }
 }

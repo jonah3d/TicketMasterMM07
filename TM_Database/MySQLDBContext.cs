@@ -15,7 +15,7 @@ namespace TM_Database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySql(
-                "Server=localhost;Database=ticketmaster;User=jonah3d;Password=jonah3d;"
+                "Server=10.2.227.118;Database=ticketmaster;User=jonah3d;Password=jonah3d;"
 
             );
         }

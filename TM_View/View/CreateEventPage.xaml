@@ -20,43 +20,45 @@
 
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
                 <TextBlock Text="Nom:" FontSize="24" FontWeight="Bold"/>
-                <TextBox  Width="200" Margin="25,0,0,0"/>
+                <TextBox  Width="200" Margin="100,0,0,0" x:Name="Tb_EvtNom"/>
 
-                <TextBlock Text="Performer:" FontSize="24" FontWeight="Bold" Margin="25,0,0,0"/>
-                <TextBox Width="200" Margin="25,0,0,0"/>
+                <TextBlock Text="Performer:" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
+                <TextBox Width="200" Margin="35,0,0,0"  x:Name="Tb_EvtPerformer"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,30,0,0">
                 <TextBlock Text="Description:" FontSize="24" FontWeight="Bold"/>
-                <TextBox  Width="200" Height="200" Margin="25,0,0,0" TextWrapping="Wrap"/>
+                <TextBox  Width="200" Margin="25,0,0,0"  x:Name="Tb_EvtDescription"/>
 
-                <Button Content="Image" Width="100" Margin="50,0,0,0"/>
-                <Image Width="200" Height="200" Margin="25,0,0,0"/>
+                <TextBlock Text="Sala:" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
+                <ComboBox  Width="200" Margin="106,0,0,0" x:Name="cmb_sala" DisplayMemberPath="Nom">
+
+                </ComboBox>
+
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
                 <TextBlock Text="Date:" FontSize="24" FontWeight="Bold"/>
-                <CalendarDatePicker  Width="200" Margin="25,0,0,0"/>
+                <CalendarDatePicker  Width="200" Margin="100,0,0,0"  x:Name="CDP_EvtDate"/>
 
-                <TextBlock Text="Time:" FontSize="24" FontWeight="Bold" Margin="25,0,0,0"/>
-                <TimePicker Width="300" Margin="25,0,0,0"/>
+                <TextBlock Text="Time:" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
+                <TimePicker Width="300" Margin="98,0,0,0"  x:Name="TP_EvtTime"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
                 <TextBlock Text="Event Type" FontSize="24" FontWeight="Bold"/>
-                <ComboBox Width="200" Margin="25,0,0,0" x:Name="cmb_type">
+                <ComboBox Width="200" Margin="38,0,0,0" x:Name="cmb_type">
                 </ComboBox>
-                <TextBlock Text="Status" FontSize="24" FontWeight="Bold" Margin="25,0,0,0"/>
-                <ComboBox Width="200" Margin="25,0,0,0" x:Name="cmb_status">
+                <TextBlock Text="Status" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
+                <ComboBox Width="200" Margin="85,0,0,0" x:Name="cmb_status">
                 </ComboBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
-                <TextBlock Text="Sala:" FontSize="24" FontWeight="Bold"/>
-                <ComboBox  Width="200" Margin="25,0,0,0" x:Name="cmb_sala" DisplayMemberPath="Nom">
-                    
-                </ComboBox>
 
-               
+
+                <Button Content="Image" Width="100"  x:Name="btn_EvtImgSelector" Click="btn_EvtImgSelector_Click"/>
+                <Image Width="200" Height="200" Margin="60,0,0,0"  x:Name="Img_EvtImg"/>
+
             </StackPanel>
             
         </StackPanel>

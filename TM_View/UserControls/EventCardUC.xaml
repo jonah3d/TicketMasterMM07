@@ -10,7 +10,7 @@
     d:DesignWidth="400" 
     x:Name="ucRoot">
 
-    <Grid Height="200" Width="200">
+    <Grid Height="400" Width="300">
 
         <Image x:Name="EventImage" Stretch="UniformToFill" Source="{Binding ElementName=ucRoot, Path=TheEvent.ImatgePath}"/>
 
