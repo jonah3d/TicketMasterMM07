@@ -10,14 +10,14 @@ using TM_Model;
 
 namespace TM_Database.Repository
 {
-    public class EventRepository : IEventRepository
+    public class Repository : IRepository
     {
     
         private MySQLDBContext context;
         private DbConnection connection;
 
 
-        public EventRepository()
+        public Repository()
         {
             this.context = new MySQLDBContext();
 
@@ -360,7 +360,7 @@ namespace TM_Database.Repository
 
         }
 
-        ObservableCollection<Sala> IEventRepository.GetAllSalas()
+        ObservableCollection<Sala> IRepository.GetAllSalas()
         {
            ObservableCollection<Sala> salas = new ObservableCollection<Sala>();
 

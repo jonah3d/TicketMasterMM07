@@ -12,8 +12,8 @@
         <NavigationView.MenuItems>
             <NavigationViewItem Icon="Home" Content="Home" Tag="HomePage" />
             <NavigationViewItem Icon="Calendar"  Content="Create Event" Tag="CreateEventPage">
-
             </NavigationViewItem>
+            <NavigationViewItem Icon="List" Content="Events" Tag="EventsPage"/>
 
         </NavigationView.MenuItems>
         <Frame x:Name="contentFrame"/>

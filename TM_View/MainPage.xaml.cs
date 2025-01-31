@@ -54,6 +54,10 @@ namespace TM_View
                         case "CreateEventPage":
                             contentFrame.Navigate(typeof(CreateEventPage));
                             break;
+
+                            case "EventsPage":
+                            contentFrame.Navigate(typeof(EventsPage));
+                            break;
                     }
                 }
             }

@@ -28,7 +28,7 @@ namespace TM_View.View
     public sealed partial class CreateEventPage : Page
     {
         private Estat estat;
-        private IEventRepository eventRepository;
+        private IRepository eventRepository;
         private MySQLDBContext context;
         private DbConnection dBconnection;
         private ObservableCollection<Sala> salas { get; set; } = new ObservableCollection<Sala>();
@@ -37,7 +37,7 @@ namespace TM_View.View
             this.InitializeComponent();
 
           
-              eventRepository = new EventRepository();
+              eventRepository = new Repository();
            
 
            cmb_status.ItemsSource = Enum.GetValues(typeof(Estat));
@@ -66,15 +66,24 @@ namespace TM_View.View
             }
         }
 
-        private void btn_EvtImgSelector_Click(object sender, RoutedEventArgs e)
+        private async void btn_EvtImgSelector_Click(object sender, RoutedEventArgs e)
         {
+            TextBox inputTextBox = new TextBox();
             ContentDialog dialog = new ContentDialog
             {
-                Title = "Select an image",
-                Content = "Choose an image from your computer",
+                Title = "Enter Image Url",
+                Content = inputTextBox,
                 PrimaryButtonText = "Select",
                 CloseButtonText = "Cancel"
             };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                string userInput = inputTextBox.Text;
+              
+            }
         }
     }
 }

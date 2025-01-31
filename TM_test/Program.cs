@@ -7,7 +7,7 @@ namespace TM_test
     {
         static void Main(string[] args)
         {
-           IEventRepository eventRepository = new EventRepository();
+           IRepository eventRepository = new Repository();
             Console.WriteLine("Music Events!");
 
             eventRepository.GetAllMusicEvent();

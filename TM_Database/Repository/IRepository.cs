@@ -8,7 +8,7 @@ using TM_Model;
 
 namespace TM_Database.Repository
 {
-    public interface IEventRepository
+    public interface IRepository
     {
 
         ObservableCollection<Event> GetAllEvents();

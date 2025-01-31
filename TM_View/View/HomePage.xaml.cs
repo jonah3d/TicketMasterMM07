@@ -26,7 +26,7 @@ namespace TM_View.View
 {
     public sealed partial class HomePage : Page
     {
-        private IEventRepository eventRepository;
+        private IRepository eventRepository;
         
         public ObservableCollection<Event> musicEvents { get; set; } = new ObservableCollection<Event>();
         public ObservableCollection<Event> theatreEvents { get; set; } = new ObservableCollection<Event>();
@@ -42,7 +42,7 @@ namespace TM_View.View
             this.InitializeComponent();
             try
             {
-                    eventRepository = new EventRepository();
+                    eventRepository = new Repository();
 
 
                 LoadSportsEvent();
