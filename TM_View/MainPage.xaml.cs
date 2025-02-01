@@ -14,13 +14,12 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
+
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace TM_View
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
+    
     public sealed partial class MainPage : Page
     {
         public MainPage()
@@ -28,13 +27,42 @@ namespace TM_View
             this.InitializeComponent();
             MainNavigation.ItemInvoked += MainNavigation_ItemInvoked;
 
+            contentFrame.NavigationFailed += ContentFrame_NavigationFailed;
+            contentFrame.Navigated += ContentFrame_Navigated;
 
             contentFrame.Navigate(typeof(HomePage));
 
 
             MainNavigation.SelectedItem = MainNavigation.MenuItems[0];
+
+            MainNavigation.BackRequested += MainNavigation_BackRequested;
         }
 
+        private void ContentFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
+        {
+            ContentDialog errorDialog = new ContentDialog
+            {
+                Title = "Navigation failed",
+                Content = "Failed to load page " + e.SourcePageType.Name,
+                CloseButtonText = "Ok"
+            };
+            errorDialog.ShowAsync();
+        }
+
+        private void MainNavigation_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+        {
+            if (contentFrame.CanGoBack)
+            {
+                contentFrame.GoBack();
+            }
+        }
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+           
+            MainNavigation.IsBackEnabled = contentFrame.CanGoBack;
+        }
+
+     
         private void MainNavigation_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             if (args.IsSettingsInvoked)

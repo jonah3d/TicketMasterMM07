@@ -20,6 +20,7 @@ using Windows.UI.Xaml.Navigation;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Windows.UI.Core;
 
 
 namespace TM_View.View
@@ -32,6 +33,8 @@ namespace TM_View.View
         private MySQLDBContext context;
         private DbConnection dBconnection;
         private ObservableCollection<Sala> salas { get; set; } = new ObservableCollection<Sala>();
+
+
         public CreateEventPage()
         {
             this.InitializeComponent();
@@ -47,6 +50,7 @@ namespace TM_View.View
            
             this.DataContext = this;
         }
+      
 
         public void loadSalas()
         {
@@ -84,6 +88,24 @@ namespace TM_View.View
                 string userInput = inputTextBox.Text;
               
             }
+        }
+
+        private void Btn_CreateEvent_Click(object sender, RoutedEventArgs e)
+        {
+            string name = Tb_EvtNom.Text;
+            string description = Tb_EvtDescription.Text;
+            DateTime date = CDP_EvtDate.Date.Value.DateTime;
+
+
+            string eventTypeString =  cmb_type.SelectedItem.ToString();
+            TipusEvent eventType = (TipusEvent)Enum.Parse(typeof(TipusEvent), eventTypeString);
+
+            string statusString = cmb_status.SelectedItem.ToString();
+            Estat status = (Estat)Enum.Parse(typeof(Estat), statusString);
+
+            string performer = Tb_EvtPerformer.Text;
+
+          cmb_sala.SelectedItem.ToString();
         }
     }
 }

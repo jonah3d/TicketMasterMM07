@@ -54,11 +54,12 @@
                 </ComboBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
-
-
                 <Button Content="Image" Width="100"  x:Name="btn_EvtImgSelector" Click="btn_EvtImgSelector_Click"/>
                 <Image Width="200" Height="200" Margin="60,0,0,0"  x:Name="Img_EvtImg"/>
+            </StackPanel>
 
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Create" Width="100" Height="50" Margin="0,50,0,0" x:Name="Btn_CreateEvent" Click="Btn_CreateEvent_Click" VerticalAlignment="Center"/>
             </StackPanel>
             
         </StackPanel>

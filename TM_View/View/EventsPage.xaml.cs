@@ -34,10 +34,18 @@ namespace TM_View.View
             this.InitializeComponent();
             this.repository = new Repository();
             loadAllEvents();
+         
+
 
             Dg_Events.ItemsSource = events;
 
             this.DataContext = this;
+
+            Btn_EditEvent.IsEnabled = false;
+            Btn_DeleteEvent.IsEnabled = false;
+            Btn_AddEvent.IsEnabled = true;
+
+            Dg_Events.SelectionChanged += Dg_Events_SelectionChanged;
 
         }
 
@@ -65,6 +73,39 @@ namespace TM_View.View
             }
         }
 
-     
+        private void Btn_AddEvent_Click(object sender, RoutedEventArgs e)
+        {
+            var mainPage = Window.Current.Content as Frame;
+            if (mainPage != null)
+            {
+                var navView = (mainPage.Content as MainPage)?.FindName("contentFrame") as Frame;
+                if (navView != null)
+                {
+                    navView.Navigate(typeof(CreateEventPage),null);
+                }
+            }
+        }
+
+        private void Btn_EditEvent_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_DeleteEvent_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Dg_Events_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            bool hasSelection = Dg_Events.SelectedItem != null;
+
+           
+            Btn_EditEvent.IsEnabled = hasSelection;
+            Btn_DeleteEvent.IsEnabled = hasSelection;
+
+           
+            Btn_AddEvent.IsEnabled = !hasSelection;
+        }
     }
 }
