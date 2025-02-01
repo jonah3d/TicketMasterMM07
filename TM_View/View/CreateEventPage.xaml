@@ -17,7 +17,7 @@
 
 
         <StackPanel Grid.Column="0" Orientation="Vertical">
-
+            <TextBlock Text="Create Event" FontSize="60" FontWeight="Bold"  HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
                 <TextBlock Text="Nom:" FontSize="24" FontWeight="Bold"/>
                 <TextBox  Width="200" Margin="100,0,0,0" x:Name="Tb_EvtNom"/>

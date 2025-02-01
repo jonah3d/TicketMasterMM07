@@ -56,8 +56,18 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to initialize: {ex.Message}", ex);
+                ShowErrorDialogue(ex);
             }
+        }
+
+        private static void ShowErrorDialogue(Exception ex)
+        {
+            ContentDialog errorDialog = new ContentDialog
+            {
+                Title = "Error",
+                Content = ex.Message,
+                CloseButtonText = "Ok"
+            };
         }
 
         private void LoadMusicEvents()
@@ -75,7 +85,7 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Loading events error: {ex.Message}");
+                ShowErrorDialogue(ex);
             }
         }
 
@@ -93,7 +103,7 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Loading events error: {ex.Message}");
+               ShowErrorDialogue(ex);
             }
         }
 
@@ -113,7 +123,7 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Loading events error: {ex.Message}");
+                ShowErrorDialogue(ex);
             }
         }
 
@@ -130,7 +140,7 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Loading events error: {ex.Message}");
+                ShowErrorDialogue(ex);
             }
         }
 
@@ -148,7 +158,7 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Loading events error: {ex.Message}");
+                ShowErrorDialogue(ex);
             }
         }
 
@@ -166,7 +176,7 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Loading events error: {ex.Message}");
+                ShowErrorDialogue(ex);
             }
         }
 
@@ -184,7 +194,7 @@ namespace TM_View.View
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Loading events error: {ex.Message}");
+                ShowErrorDialogue(ex);
             }
         }
     }

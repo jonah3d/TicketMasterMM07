@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TM_Database.Repository;
+using TM_Model;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -22,9 +25,46 @@ namespace TM_View.View
     /// </summary>
     public sealed partial class EventsPage : Page
     {
+
+        private IRepository repository;
+        private ObservableCollection<Event> events = new ObservableCollection<Event>();
+
         public EventsPage()
         {
             this.InitializeComponent();
+            this.repository = new Repository();
+            loadAllEvents();
+
+            Dg_Events.ItemsSource = events;
+
+            this.DataContext = this;
+
         }
+
+
+        void loadAllEvents()
+        {
+            try
+            {
+                var allEvents = repository.GetAllEvents();
+                events.Clear();
+                foreach (var item in allEvents)
+                {
+                    events.Add(item);
+                }
+            }
+            catch (Exception e)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = e.Message,
+                    CloseButtonText = "Ok"
+                };
+
+            }
+        }
+
+     
     }
 }

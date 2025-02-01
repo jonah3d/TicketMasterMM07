@@ -4,12 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TM_View.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -24,6 +25,43 @@
             <Button Content="Search" Width="100" Height="50"/>
 
         </StackPanel>
+
+        <StackPanel Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+            <controls:DataGrid x:Name="Dg_Events" 
+                   Height="800" 
+                   AutoGenerateColumns="False" IsReadOnly="True">
+                <controls:DataGrid.Columns >
+                    <controls:DataGridTextColumn Header="Event Id" Binding="{Binding Id}" />
+                    <controls:DataGridTextColumn Header="Event Name" Binding="{Binding Nom}" />
+
+                    <controls:DataGridTextColumn Header="Performer" Binding="{Binding Protagonista}" />
+                    <controls:DataGridTextColumn Header="Sala" Binding="{Binding Sala.Nom}" />
+                    <controls:DataGridTextColumn Header="Date" Binding="{Binding Data}" />
+                    <controls:DataGridTextColumn Header="Time" Binding="{Binding Time}" />
+
+                    <controls:DataGridTemplateColumn Header="Image">
+                        <controls:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding ImatgePath}" Width="100" Height="100"/>
+                            </DataTemplate>
+                        </controls:DataGridTemplateColumn.CellTemplate>
+                    </controls:DataGridTemplateColumn>
+                    <controls:DataGridTextColumn Header="Category" Binding="{Binding Tipus}" />
+                    <controls:DataGridTextColumn Header="Event Status" Binding="{Binding Status}" />
+
+                </controls:DataGrid.Columns>
+
+            </controls:DataGrid>
+
+            <StackPanel Orientation="Vertical" Padding="20">
+                <Button Content="Add Event" Width="100" Height="100" Margin="0,10,0,10" CornerRadius="100" x:Name="Btn_AddEvent" />
+                <Button Content="Edit Event" Width="100" Height="100" Margin="0,10,0,10" CornerRadius="100" x:Name="Btn_EditEvent"/>
+                <Button Content="Delete Event" Width="100" Height="100" Margin="0,10,0,10" CornerRadius="100" x:Name="Btn_DeleteEvent"/>
+
+            </StackPanel>
+        </StackPanel>
+        
+        
         
 
     </Grid>
