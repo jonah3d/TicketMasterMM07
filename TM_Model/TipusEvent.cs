@@ -15,8 +15,6 @@ namespace TM_Model
         FAMILY,
         ARTS,
         OTHER
-
-
     }
 }
 

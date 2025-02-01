@@ -26,6 +26,60 @@ namespace TM_Database.Repository
             this.connection.Open();
         }
 
+        public Boolean CreateEvent(Event e)
+        {
+            string name = e.Nom;
+            string description = e.Desc;
+            string performer = e.Protagonista;
+            string image = e.ImatgePath;
+            DateTime date = e.Data;
+            TimeSpan time = e.Time;
+            string type = e.Tipus.ToString();
+
+            int typeID = GetTipusId(type);
+
+            Sala sala = e.Sala;
+            int salaId = GetSalaId(sala.Nom);
+
+            string estat = e.Status.ToString();
+
+            int estatID = GetStatusId(estat);
+
+            using (var transaction = connection.BeginTransaction())
+            {
+                try
+                {
+                    using (var consulta = connection.CreateCommand())
+                    {
+                        consulta.CommandText = @"insert into event (Evt_Name, Evt_Description, Evt_Performer, Evt_Image, Evt_Date, Evt_Time, Evt_Type_Id, Evt_Sala_Id, Evt_Estat_Id) 
+                                            values (@name, @description, @performer, @image, @date, @time, @type, @sala, @estat)";
+                        consulta.Parameters.Add(new MySqlParameter("@name", name));
+                        consulta.Parameters.Add(new MySqlParameter("@description", description));
+                        consulta.Parameters.Add(new MySqlParameter("@performer", performer));
+                        consulta.Parameters.Add(new MySqlParameter("@image", image));
+                        consulta.Parameters.Add(new MySqlParameter("@date", date));
+                        consulta.Parameters.Add(new MySqlParameter("@time", time));
+                        consulta.Parameters.Add(new MySqlParameter("@type", typeID));
+                        consulta.Parameters.Add(new MySqlParameter("@sala", salaId));
+                        consulta.Parameters.Add(new MySqlParameter("@estat", estatID));
+                        consulta.ExecuteNonQuery();
+
+                    }
+
+                    transaction.Commit();
+                    return true;
+                }
+
+                catch (Exception ex)
+                {
+
+                    transaction.Rollback();
+                    throw new Exception($"Can't Create Event {ex.Message}");
+                }
+            }
+
+        }
+
         public ObservableCollection<Event> GetAllArtsEvent()
         {
             ObservableCollection<Event> events = new ObservableCollection<Event>();
@@ -453,10 +507,93 @@ namespace TM_Database.Repository
 
         }
 
+        public int GetSalaId(string name)
+        {
+            try
+            {
+                using(var consulta = connection.CreateCommand())
+                {
+                    consulta.CommandText = @"select Sal_Id from sala where Sal_Name = @name";
+                    consulta.Parameters.Add(new MySqlParameter("@name", name));
+                    using (var reader = consulta.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return reader.GetInt32(reader.GetOrdinal("Sal_Id"));
+                        }
+                        else
+                        {
+                            return -1;
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Can't Get Sala Id {e.Message}");
+            }
+        }
+
+        public int GetStatusId(string name)
+        {
+            try
+            {
+                using (var consulta = connection.CreateCommand())
+                {
+                    consulta.CommandText = @"select St_Id from EVENT_STATE where St_Name = @name";
+                    consulta.Parameters.Add(new MySqlParameter("@name", name));
+                    using (var reader = consulta.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return reader.GetInt32(reader.GetOrdinal("St_Id"));
+                        }
+                        else
+                        {
+                            return -1;
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Can't Get Status Id {e.Message}");
+            }
+        }
+
+        public int GetTipusId(string name)
+        {
+            try
+            {
+                using (var consulta = connection.CreateCommand())
+                {
+                    consulta.CommandText = @"select Type_Id from EVENT_TYPE where Type_Name = @name";
+                    consulta.Parameters.Add(new MySqlParameter("@name", name));
+                    using (var reader = consulta.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return reader.GetInt32(reader.GetOrdinal("Type_Id"));
+                        }
+                        else
+                        {
+                            return -1;
+                        }
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Can't Get Type Id {e.Message}");
+            }
+        }
+
         ObservableCollection<Sala> IRepository.GetAllSalas()
         {
            ObservableCollection<Sala> salas = new ObservableCollection<Sala>();
-
 
             try
             {
@@ -465,7 +602,7 @@ namespace TM_Database.Repository
                 {
                     consulta.CommandText = @"select Sal_Id, Sal_Name, Sal_Municipality, Sal_Address, Sal_MapAvail,
                                         Sal_Seats, Sal_Rows, Sal_Col from sala";
-                    using (var reader = consulta.ExecuteReader()) // Add using statement here
+                    using (var reader = consulta.ExecuteReader()) 
                     {
                         while (reader.Read())
                         {

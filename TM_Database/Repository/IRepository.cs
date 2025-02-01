@@ -20,5 +20,9 @@ namespace TM_Database.Repository
         ObservableCollection<Event> GetAllArtsEvent();
         ObservableCollection<Event> GetAllOtherEvent();
         ObservableCollection<Sala> GetAllSalas();
+        Boolean CreateEvent(Event e);
+        int GetSalaId(String name);
+        int GetStatusId(String name);
+        int GetTipusId(String name);
     }
 }

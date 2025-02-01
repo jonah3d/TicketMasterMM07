@@ -38,5 +38,19 @@ namespace TM_Model
             Status = estat;
             Tarifes = new List<Tarifa>();
         }
+
+        public Event(string name, string description, DateTime date, TimeSpan time, TipusEvent eventType, Estat status, string performer, Sala sala, string imagePath)
+        {
+            Nom = name;
+            Desc = description;
+            Data = date;
+            Time = time;
+            Tipus = eventType;
+            Status = status;
+            Protagonista = performer;
+            Sala = sala;
+            ImatgePath = imagePath;
+      
+        }
     }
 }

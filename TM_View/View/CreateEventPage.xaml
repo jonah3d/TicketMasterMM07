@@ -6,6 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+
+
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
@@ -21,47 +23,61 @@
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
                 <TextBlock Text="Nom:" FontSize="24" FontWeight="Bold"/>
                 <TextBox  Width="200" Margin="100,0,0,0" x:Name="Tb_EvtNom"/>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Name" Visibility="Collapsed"/>
 
                 <TextBlock Text="Performer:" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
                 <TextBox Width="200" Margin="35,0,0,0"  x:Name="Tb_EvtPerformer"/>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Performer" Visibility="Collapsed"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,30,0,0">
                 <TextBlock Text="Description:" FontSize="24" FontWeight="Bold"/>
                 <TextBox  Width="200" Margin="25,0,0,0"  x:Name="Tb_EvtDescription"/>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Description" Visibility="Collapsed"/>
 
                 <TextBlock Text="Sala:" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
                 <ComboBox  Width="200" Margin="106,0,0,0" x:Name="cmb_sala" DisplayMemberPath="Nom">
 
+
                 </ComboBox>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Sala" Visibility="Collapsed"/>
 
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
                 <TextBlock Text="Date:" FontSize="24" FontWeight="Bold"/>
                 <CalendarDatePicker  Width="200" Margin="100,0,0,0"  x:Name="CDP_EvtDate"/>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Date" Visibility="Collapsed"/>
 
                 <TextBlock Text="Time:" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
                 <TimePicker Width="300" Margin="98,0,0,0"  x:Name="TP_EvtTime"/>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Time" Visibility="Collapsed"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
                 <TextBlock Text="Event Type" FontSize="24" FontWeight="Bold"/>
                 <ComboBox Width="200" Margin="38,0,0,0" x:Name="cmb_type">
                 </ComboBox>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Type" Visibility="Collapsed"/>
                 <TextBlock Text="Status" FontSize="24" FontWeight="Bold" Margin="100,0,0,0"/>
                 <ComboBox Width="200" Margin="85,0,0,0" x:Name="cmb_status">
                 </ComboBox>
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Status" Visibility="Collapsed"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,50,0,0">
-                <Button Content="Image" Width="100"  x:Name="btn_EvtImgSelector" Click="btn_EvtImgSelector_Click"/>
-                <Image Width="200" Height="200" Margin="60,0,0,0"  x:Name="Img_EvtImg"/>
+                <TextBox Width="200" Height="40" x:Name="Tb_imgeurl"/>
+                <Image Width="200" Height="200" Margin="60,0,0,0"  x:Name="Img_EvtImg" />
+                <Rectangle Width="10" Height="10" Margin="5,0,0,0" Fill="Red" x:Name="Err_Img" Visibility="Collapsed"/>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
-                <Button Content="Create" Width="100" Height="50" Margin="0,50,0,0" x:Name="Btn_CreateEvent" Click="Btn_CreateEvent_Click" VerticalAlignment="Center"/>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Center" >
+                <Button Content="Create" Width="100" Height="50" Margin="0,50,0,0" 
+                 x:Name="Btn_CreateEvent" Click="Btn_CreateEvent_Click" VerticalAlignment="Center"/>
+
+                <TextBlock Text="Hey" x:Name="RTB_Error" Foreground="Red" FontSize="8"/>
+
             </StackPanel>
-            
+
         </StackPanel>
 
     </Grid>
