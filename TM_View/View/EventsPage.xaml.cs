@@ -86,7 +86,16 @@ namespace TM_View.View
 
         private void Btn_EditEvent_Click(object sender, RoutedEventArgs e)
         {
-
+            var mainPage = Window.Current.Content as Frame;
+            var selectedEvent = Dg_Events.SelectedItem as Event;
+            if (mainPage != null)
+            {
+                var navView = (mainPage.Content as MainPage)?.FindName("contentFrame") as Frame;
+                if (navView != null)
+                {
+                    navView.Navigate(typeof(EditEvent), selectedEvent);
+                }
+            }
         }
 
         private async void Btn_DeleteEvent_Click(object sender, RoutedEventArgs e)
@@ -106,7 +115,7 @@ namespace TM_View.View
                             CloseButtonText = "Ok"
                         };
                         await errorDialog.ShowAsync();
-
+                       loadAllEvents();
                     }
                     else
                     {

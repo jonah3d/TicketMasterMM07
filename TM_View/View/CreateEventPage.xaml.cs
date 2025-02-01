@@ -30,8 +30,7 @@ namespace TM_View.View
     {
         private Estat estat;
         private IRepository eventRepository;
-        private MySQLDBContext context;
-        private DbConnection dBconnection;
+       
         private ObservableCollection<Sala> salas { get; set; } = new ObservableCollection<Sala>();
         
 
