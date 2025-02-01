@@ -21,6 +21,8 @@ namespace TM_Database.Repository
         ObservableCollection<Event> GetAllOtherEvent();
         ObservableCollection<Sala> GetAllSalas();
         Boolean CreateEvent(Event e);
+        Boolean DeleteEvent(Event e);
+        Boolean UpdateEvent(Event e);
         int GetSalaId(String name);
         int GetStatusId(String name);
         int GetTipusId(String name);

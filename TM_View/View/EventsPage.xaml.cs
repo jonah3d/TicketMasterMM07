@@ -20,9 +20,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace TM_View.View
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
+   
     public sealed partial class EventsPage : Page
     {
 
@@ -91,8 +89,49 @@ namespace TM_View.View
 
         }
 
-        private void Btn_DeleteEvent_Click(object sender, RoutedEventArgs e)
+        private async void Btn_DeleteEvent_Click(object sender, RoutedEventArgs e)
         {
+            Event selectedEvent = Dg_Events.SelectedItem as Event;
+
+            if (selectedEvent != null)
+            {
+                try
+                {
+                    if (repository.DeleteEvent(selectedEvent))
+                    {
+                        ContentDialog errorDialog = new ContentDialog
+                        {
+                            Title = "Success!",
+                            Content = "Event Deleted Successfully",
+                            CloseButtonText = "Ok"
+                        };
+                        await errorDialog.ShowAsync();
+
+                    }
+                    else
+                    {
+                        ContentDialog errorDialog = new ContentDialog
+                        {
+                            Title = "Error",
+                            Content = "Error deleting event",
+                            CloseButtonText = "Ok"
+                        };
+                        await errorDialog.ShowAsync();
+
+                    }
+                      
+                }
+                catch (Exception ex)
+                {
+                    ContentDialog errorDialog = new ContentDialog
+                    {
+                        Title = "Error",
+                        Content = ex.Message,
+                        CloseButtonText = "Ok"
+                    };
+                   await errorDialog.ShowAsync();
+                }
+            }
 
         }
 

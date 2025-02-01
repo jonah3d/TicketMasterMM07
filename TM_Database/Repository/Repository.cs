@@ -12,18 +12,11 @@ namespace TM_Database.Repository
 {
     public class Repository : IRepository
     {
-    
-        private MySQLDBContext context;
-        private DbConnection connection;
 
 
         public Repository()
         {
-            this.context = new MySQLDBContext();
-
-            this.connection = context.Database.GetDbConnection();
-
-            this.connection.Open();
+            
         }
 
         public Boolean CreateEvent(Event e)
@@ -45,39 +38,94 @@ namespace TM_Database.Repository
 
             int estatID = GetStatusId(estat);
 
-            using (var transaction = connection.BeginTransaction())
+            try
             {
-                try
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    using (var consulta = connection.CreateCommand())
+                    using (var connection = context.Database.GetDbConnection())
                     {
-                        consulta.CommandText = @"insert into event (Evt_Name, Evt_Description, Evt_Performer, Evt_Image, Evt_Date, Evt_Time, Evt_Type_Id, Evt_Sala_Id, Evt_Estat_Id) 
-                                            values (@name, @description, @performer, @image, @date, @time, @type, @sala, @estat)";
-                        consulta.Parameters.Add(new MySqlParameter("@name", name));
-                        consulta.Parameters.Add(new MySqlParameter("@description", description));
-                        consulta.Parameters.Add(new MySqlParameter("@performer", performer));
-                        consulta.Parameters.Add(new MySqlParameter("@image", image));
-                        consulta.Parameters.Add(new MySqlParameter("@date", date));
-                        consulta.Parameters.Add(new MySqlParameter("@time", time));
-                        consulta.Parameters.Add(new MySqlParameter("@type", typeID));
-                        consulta.Parameters.Add(new MySqlParameter("@sala", salaId));
-                        consulta.Parameters.Add(new MySqlParameter("@estat", estatID));
-                        consulta.ExecuteNonQuery();
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var transaction = connection.BeginTransaction())
+                        {
+                            try
+                            {
+                                using (var consulta = connection.CreateCommand())
+                                {
+                                    consulta.Transaction = transaction;
+                                    consulta.CommandText = @"insert into event (Evt_Name, Evt_Description, Evt_Performer, Evt_Image, Evt_Date, Evt_Time, Evt_Type_Id, Evt_Sala_Id, Evt_Estat_Id) 
+                                                        values (@name, @description, @performer, @image, @date, @time, @type, @sala, @estat)";
+                                    consulta.Parameters.Add(new MySqlParameter("@name", name));
+                                    consulta.Parameters.Add(new MySqlParameter("@description", description));
+                                    consulta.Parameters.Add(new MySqlParameter("@performer", performer));
+                                    consulta.Parameters.Add(new MySqlParameter("@image", image));
+                                    consulta.Parameters.Add(new MySqlParameter("@date", date));
+                                    consulta.Parameters.Add(new MySqlParameter("@time", time));
+                                    consulta.Parameters.Add(new MySqlParameter("@type", typeID));
+                                    consulta.Parameters.Add(new MySqlParameter("@sala", salaId));
+                                    consulta.Parameters.Add(new MySqlParameter("@estat", estatID));
+                                    consulta.ExecuteNonQuery();
+                                }
+
+                                transaction.Commit();
+                                return true;
+
+                            }
+                            catch (Exception ex)
+                            {
+                                transaction.Rollback();
+                                throw new Exception($"Can't Create Event {ex.Message}");
+                            }
+                        }
+
 
                     }
-
-                    transaction.Commit();
-                    return true;
-                }
-
-                catch (Exception ex)
-                {
-
-                    transaction.Rollback();
-                    throw new Exception($"Can't Create Event {ex.Message}");
                 }
             }
+            catch (Exception ex)
+            {
+                throw new Exception($"Can't Create Event {ex.Message}");
+            }
+        }
 
+        public bool DeleteEvent(Event e)
+        {
+            using(MySQLDBContext context = new MySQLDBContext())
+            {
+                using(var connection = context.Database.GetDbConnection())
+                {
+                    connection.Open();
+                    if (connection.State != System.Data.ConnectionState.Open)
+                    {
+                        throw new Exception("Can't Open Connection");
+                    }
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            using (var consulta = connection.CreateCommand())
+                            {
+                                consulta.Transaction = transaction;
+                                consulta.CommandText = @"delete from event where Evt_Id = @id";
+                                consulta.Parameters.Add(new MySqlParameter("@id", e.Id));
+                                consulta.ExecuteNonQuery();
+                            }
+                            transaction.Commit();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            throw new Exception($"Can't Delete Event {ex.Message}");
+                        }
+                    }
+                }
+            }
         }
 
         public ObservableCollection<Event> GetAllArtsEvent()
@@ -86,40 +134,53 @@ namespace TM_Database.Repository
 
             try
             {
-
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+                          
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              where et.Type_Name = 'ARTS'";
 
-                    using (var reader = consulta.ExecuteReader()) // Add using statement here
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                            using (var reader = consulta.ExecuteReader()) // Add using statement here
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
-                            // Convert string to enum
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
                         }
                     }
                 }
@@ -141,38 +202,51 @@ namespace TM_Database.Repository
             try
             {
 
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              where et.Type_Name = 'CINEMA'";
-                    using (var reader = consulta.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
-                            // Convert string to enum
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
                         }
                     }
                 }
@@ -192,38 +266,51 @@ namespace TM_Database.Repository
 
             try
             {
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              order by e.Evt_Id";
-                    using (var reader = consulta.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
-
-                        
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+
+
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
                         }
                     }
                   
@@ -243,40 +330,52 @@ namespace TM_Database.Repository
 
             try
             {
-
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              where et.Type_Name = 'FAMILY'";
 
-                    using (var reader = consulta.ExecuteReader()) // Add using statement here
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                            using (var reader = consulta.ExecuteReader()) // Add using statement here
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
-                            // Convert string to enum
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
                         }
                     }
                 }
@@ -295,47 +394,59 @@ namespace TM_Database.Repository
 
             try
             {
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
 
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              where et.Type_Name = 'MUSIC'";
 
-                    using (var reader = consulta.ExecuteReader()) // Add using statement here
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                            using (var reader = consulta.ExecuteReader()) // Add using statement here
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
-                            // Convert string to enum
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
+
+
                         }
+
                     }
-
-
                 }
-
-
 
 
                 return events;
@@ -353,43 +464,54 @@ namespace TM_Database.Repository
 
             try
             {
-
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              where et.Type_Name = 'OTHER'";
 
-                    using (var reader = consulta.ExecuteReader()) // Add using statement here
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                            using (var reader = consulta.ExecuteReader()) // Add using statement here
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
-                            // Convert string to enum
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
                         }
                     }
-
                 }
                 return events;
             }
@@ -407,43 +529,55 @@ namespace TM_Database.Repository
 
             try
             {
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              where et.Type_Name = 'SPORTS'";
 
-                    using (var reader = consulta.ExecuteReader()) // Add using statement here
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                            using (var reader = consulta.ExecuteReader()) // Add using statement here
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
 
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
-                            // Convert string to enum
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
                         }
                     }
-
                 }
                 return events;
             }
@@ -460,43 +594,55 @@ namespace TM_Database.Repository
 
             try
             {
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, et.Type_Name, s.Sal_Name, es.St_Name 
                              from event e
                              join event_type et on e.Evt_Type_Id = et.Type_Id
                              join event_state es on e.Evt_Estat_Id = es.St_Id
                              join sala s on e.Evt_Sala_Id = s.Sal_Id
                              where et.Type_Name = 'THEATER'";
 
-                    using (var reader = consulta.ExecuteReader()) // Add using statement here
-                    {
-                        while (reader.Read())
-                        {
-                            long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
-                            string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                            string performer = reader.GetString(reader.GetOrdinal("Evt_Performer"));
-                            string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
-                            DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
-                            TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+                            using (var reader = consulta.ExecuteReader()) // Add using statement here
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
 
-                            string type = reader.GetString(reader.GetOrdinal("Type_Name"));
-                            string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            Sala sala1 = new Sala(sala);
-                            string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
 
-                            // Convert string to enum
-                            TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
-                            Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
 
 
-                            Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
-                            events.Add(e);
+                                    Event e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                    events.Add(e);
+                                }
+                            }
                         }
                     }
                 }
-
                 return events;
             }
             catch (Exception e)
@@ -511,19 +657,32 @@ namespace TM_Database.Repository
         {
             try
             {
-                using(var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select Sal_Id from sala where Sal_Name = @name";
-                    consulta.Parameters.Add(new MySqlParameter("@name", name));
-                    using (var reader = consulta.ExecuteReader())
+                    using (var connection = context.Database.GetDbConnection())
                     {
-                        if (reader.Read())
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
                         {
-                            return reader.GetInt32(reader.GetOrdinal("Sal_Id"));
+                            throw new Exception("Can't Open Connection");
                         }
-                        else
+
+                        using (var consulta = connection.CreateCommand())
                         {
-                            return -1;
+                            consulta.CommandText = @"select Sal_Id from sala where Sal_Name = @name";
+                            consulta.Parameters.Add(new MySqlParameter("@name", name));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    return reader.GetInt32(reader.GetOrdinal("Sal_Id"));
+                                }
+                                else
+                                {
+                                    return -1;
+                                }
+                            }
                         }
                     }
                 }
@@ -539,23 +698,35 @@ namespace TM_Database.Repository
         {
             try
             {
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select St_Id from EVENT_STATE where St_Name = @name";
-                    consulta.Parameters.Add(new MySqlParameter("@name", name));
-                    using (var reader = consulta.ExecuteReader())
+                    using (var connection = context.Database.GetDbConnection())
                     {
-                        if (reader.Read())
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
                         {
-                            return reader.GetInt32(reader.GetOrdinal("St_Id"));
+                            throw new Exception("Can't Open Connection");
                         }
-                        else
+
+                        using (var consulta = connection.CreateCommand())
                         {
-                            return -1;
+                            consulta.CommandText = @"select St_Id from EVENT_STATE where St_Name = @name";
+                            consulta.Parameters.Add(new MySqlParameter("@name", name));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    return reader.GetInt32(reader.GetOrdinal("St_Id"));
+                                }
+                                else
+                                {
+                                    return -1;
+                                }
+                            }
                         }
                     }
                 }
-
             }
             catch (Exception e)
             {
@@ -567,23 +738,35 @@ namespace TM_Database.Repository
         {
             try
             {
-                using (var consulta = connection.CreateCommand())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    consulta.CommandText = @"select Type_Id from EVENT_TYPE where Type_Name = @name";
-                    consulta.Parameters.Add(new MySqlParameter("@name", name));
-                    using (var reader = consulta.ExecuteReader())
+                    using (var connection = context.Database.GetDbConnection())
                     {
-                        if (reader.Read())
+                        connection.Open();
+
+                        if (connection.State != System.Data.ConnectionState.Open)
                         {
-                            return reader.GetInt32(reader.GetOrdinal("Type_Id"));
+                            throw new Exception("Can't Open Connection");
                         }
-                        else
+
+                        using (var consulta = connection.CreateCommand())
                         {
-                            return -1;
+                            consulta.CommandText = @"select Type_Id from EVENT_TYPE where Type_Name = @name";
+                            consulta.Parameters.Add(new MySqlParameter("@name", name));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    return reader.GetInt32(reader.GetOrdinal("Type_Id"));
+                                }
+                                else
+                                {
+                                    return -1;
+                                }
+                            }
                         }
                     }
                 }
-
             }
             catch (Exception e)
             {
@@ -591,44 +774,60 @@ namespace TM_Database.Repository
             }
         }
 
+        public bool UpdateEvent(Event e)
+        {
+            throw new NotImplementedException();
+        }
+
         ObservableCollection<Sala> IRepository.GetAllSalas()
         {
            ObservableCollection<Sala> salas = new ObservableCollection<Sala>();
 
-            try
-            {
-
-                using (var consulta = connection.CreateCommand())
+                try
                 {
-                    consulta.CommandText = @"select Sal_Id, Sal_Name, Sal_Municipality, Sal_Address, Sal_MapAvail,
-                                        Sal_Seats, Sal_Rows, Sal_Col from sala";
-                    using (var reader = consulta.ExecuteReader()) 
-                    {
-                        while (reader.Read())
+                    using (MySQLDBContext context = new MySQLDBContext()) {
+                        using(var connection = context.Database.GetDbConnection())
                         {
-                            long id = reader.GetInt64(reader.GetOrdinal("Sal_Id"));
-                            string nom = reader.GetString(reader.GetOrdinal("Sal_Name"));
-                            string municipio = reader.GetString(reader.GetOrdinal("Sal_Municipality"));
-                            string address = reader.GetString(reader.GetOrdinal("Sal_Address"));
-                            bool mapAvail = reader.GetBoolean(reader.GetOrdinal("Sal_MapAvail"));
-                            int seats = reader.GetInt32(reader.GetOrdinal("Sal_Seats"));
-                            int rows = reader.GetInt32(reader.GetOrdinal("Sal_Rows"));
-                            int col = reader.GetInt32(reader.GetOrdinal("Sal_Col"));
-                            Sala s = new Sala(id, nom, municipio, address, mapAvail, seats, rows, col);
-                            salas.Add(s);
+                            connection.Open();
+
+                            if(connection.State != System.Data.ConnectionState.Open)
+                            {
+                                throw new Exception("Can't Open Connection");
+                            }
+
+                                using (var consulta = connection.CreateCommand())
+                                {
+                                    consulta.CommandText = @"select Sal_Id, Sal_Name, Sal_Municipality, Sal_Address, Sal_MapAvail,
+                                                Sal_Seats, Sal_Rows, Sal_Col from sala";
+                                        using (var reader = consulta.ExecuteReader())
+                                        {
+                                                while (reader.Read())
+                                                {
+                                                    long id = reader.GetInt64(reader.GetOrdinal("Sal_Id"));
+                                                    string nom = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                                    string municipio = reader.GetString(reader.GetOrdinal("Sal_Municipality"));
+                                                    string address = reader.GetString(reader.GetOrdinal("Sal_Address"));
+                                                    bool mapAvail = reader.GetBoolean(reader.GetOrdinal("Sal_MapAvail"));
+                                                    int seats = reader.GetInt32(reader.GetOrdinal("Sal_Seats"));
+                                                    int rows = reader.GetInt32(reader.GetOrdinal("Sal_Rows"));
+                                                    int col = reader.GetInt32(reader.GetOrdinal("Sal_Col"));
+                                                    Sala s = new Sala(id, nom, municipio, address, mapAvail, seats, rows, col);
+                                                    salas.Add(s);
+                                                }
+                                        }
+                            
+                                }
                         }
                     }
 
+
+                    return salas;
                 }
+                    catch (Exception e)
+                    {
+                        throw new Exception($"Can't Get All Salas {e.Message}");
 
-
-                return salas;
-            }
-            catch (Exception e)
-            {
-                throw new Exception($"Can't Get All Salas {e.Message}");
-
-            }
+                    }
         }
     }
 }
