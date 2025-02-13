@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
 using TM_Model;
 using Windows.Foundation;
@@ -26,35 +27,41 @@ namespace TM_View.View
         private Windows.UI.Color currentUIColor = Windows.UI.Colors.Gray;
         private ObservableCollection<Zona> zones = new ObservableCollection<Zona>();
         private Button[,] seatButtons;
+        private static SolidColorBrush grey = new SolidColorBrush(Windows.UI.Colors.LightGray);
+        private Zona selectedZone;
 
         public CreacionSala()
         {
             this.InitializeComponent();
             InitializeControls();
+
+            Lv_ZonaList.ItemsSource = zones;
+
+            this.DataContext = this;
         }
         private void InitializeControls()
         {
-            // Initialize ComboBoxes with values 1-50
+      
             for (int i = 1; i <= 50; i++)
             {
                 Cmb_SalaRow.Items.Add(i);
                 Cmb_SalaCol.Items.Add(i);
             }
 
-            // Set default selections
             Cmb_SalaRow.SelectedIndex = 0;
             Cmb_SalaCol.SelectedIndex = 0;
 
-            // Add event handlers
+       
             Cmb_SalaRow.SelectionChanged += UpdateSeatingGrid;
             Cmb_SalaCol.SelectionChanged += UpdateSeatingGrid;
+            Lv_ZonaList.SelectionChanged += Lv_ZonaList_SelectionChanged;
             Btn_PaintZone.Click += Btn_PaintZone_Click;
             Btn_EraseZone.Click += Btn_EraseZone_Click;
 
-            // Initial grid setup
+      
             UpdateSeatingGrid(null, null);
         }
-        // Color conversion methods
+    
         private System.Drawing.Color ConvertToDrawingColor(Windows.UI.Color uiColor)
         {
             return System.Drawing.Color.FromArgb(uiColor.A, uiColor.R, uiColor.G, uiColor.B);
@@ -76,10 +83,10 @@ namespace TM_View.View
             int rows = (int)Cmb_SalaRow.SelectedItem;
             int cols = (int)Cmb_SalaCol.SelectedItem;
 
-            // Clear existing grid
+    
             GV_Zones.Items.Clear();
 
-            // Create uniform grid for seats
+         
             var uniformGrid = new Grid();
             for (int i = 0; i < rows; i++)
                 uniformGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });
@@ -88,7 +95,7 @@ namespace TM_View.View
 
             seatButtons = new Button[rows, cols];
 
-            // Create seat buttons
+       
             for (int r = 0; r < rows; r++)
             {
                 for (int c = 0; c < cols; c++)
@@ -98,7 +105,7 @@ namespace TM_View.View
                         Width = 25,
                         Height = 25,
                         Margin = new Thickness(2),
-                        Background = new SolidColorBrush(Windows.UI.Colors.LightGray)
+                        Background = grey
                     };
 
                     seatButton.Click += SeatButton_Click;
@@ -113,7 +120,7 @@ namespace TM_View.View
             gridViewItem.Content = uniformGrid;
             GV_Zones.Items.Add(gridViewItem);
 
-            // Update capacity
+      
             UpdateTotalCapacity();
         }
         private void ZonaColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
@@ -121,30 +128,37 @@ namespace TM_View.View
             currentUIColor = args.NewColor;
             Btn_ColorBrush.Color = currentUIColor;
         }
-        private void Btn_PaintZone_Click(object sender, RoutedEventArgs e)
+        private async void Btn_PaintZone_Click(object sender, RoutedEventArgs e)
         {
-            isPaintMode = !isPaintMode;
-            Btn_PaintZone.Background = isPaintMode ?
-                new SolidColorBrush(Windows.UI.Colors.LightGreen) :
-                new SolidColorBrush(Windows.UI.Colors.Transparent);
+     
+                isPaintMode = true;
+                ZonaColorPicker.Color = currentUIColor;
+            
         }
         private void Btn_EraseZone_Click(object sender, RoutedEventArgs e)
         {
             isPaintMode = false;
             currentUIColor = Windows.UI.Colors.LightGray;
-            Btn_PaintZone.Background = new SolidColorBrush(Windows.UI.Colors.Transparent);
+            ZonaColorPicker.Color = currentUIColor;
+
         }
 
         private void Btn_ClearColorSel_Click(object sender, RoutedEventArgs e)
         {
+
+            Tb_ZonaName.Text = "";
+            Tb_ZonaCapacity.Text = "";
             currentUIColor = Windows.UI.Colors.Gray;
             Btn_ColorBrush.Color = currentUIColor;
+            Btn_ColorPicker.Background = new SolidColorBrush(currentUIColor);
+            Lv_ZonaList.SelectedItem = null;
+            selectedZone = null;
         }
         private void Btn_AddZona_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(Tb_ZonaName.Text)) return;
 
-            int capacity = CountSeatsOfColor(currentUIColor);
+            int capacity = Int32.Parse(Tb_ZonaCapacity.Text);
             var drawingColor = ConvertToDrawingColor(currentUIColor);
 
             var zone = new Zona(
@@ -154,25 +168,72 @@ namespace TM_View.View
             );
 
             zones.Add(zone);
-            UpdateZonesList();
-            UpdateTotalCapacity();
         }
 
-        private void SeatButton_Click(object sender, RoutedEventArgs e)
+
+        private async void SeatButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button seatButton && isPaintMode)
+            if (selectedZone == null)
             {
-                seatButton.Background = new SolidColorBrush(currentUIColor);
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = "Select An Existing Zone",
+                    CloseButtonText = "Ok"
+                };
+                await errorDialog.ShowAsync();
+            }else if( selectedZone != null)
+            {
+                if (sender is Button seatButton)
+                {
+
+                    var ZoneCapacity = selectedZone.Capacitat;
+
+                    for(int i = 0; i < seatButtons.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < seatButtons.GetLength(1); j++)
+                        {
+                            if (seatButtons[i, j] == seatButton)
+                            {
+                                if (isPaintMode)
+                                {
+                                    if (CountSeatsOfColor(ConvertToUIColor(selectedZone.Z_Color)) >= ZoneCapacity)
+                                    {
+                                        ContentDialog errorDialog = new ContentDialog
+                                        {
+                                            Title = "Alert!",
+                                            Content = "Zone Capacity Exceeded",
+                                            CloseButtonText = "Ok"
+                                        };
+                                        await errorDialog.ShowAsync();
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    seatButton.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
+                    seatButton.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
+
+                    Cadira newSeat = new Cadira();
+                    selectedZone.Cadires.Add(newSeat);
+                }
             }
+
         }
 
         private void Btn_DelZona_Click(object sender, RoutedEventArgs e)
         {
             if (Lv_ZonaList.SelectedItem is Zona selectedZone)
             {
-                var uiColor = ConvertToUIColor(selectedZone.color);
+                var uiColor = ConvertToUIColor(selectedZone.Z_Color);
 
-                // Change all seats of this color back to default
+           
                 foreach (var button in seatButtons)
                 {
                     if (((SolidColorBrush)button.Background).Color == uiColor)
@@ -182,7 +243,7 @@ namespace TM_View.View
                 }
 
                 zones.Remove(selectedZone);
-                UpdateZonesList();
+       
                 UpdateTotalCapacity();
             }
         }
@@ -197,22 +258,37 @@ namespace TM_View.View
             return count;
         }   
 
-        private void UpdateZonesList()
+        private int UpdateTotalCapacity()
         {
-            Lv_ZonaList.Items.Clear();
-            foreach (var zone in zones)
-            {
-                Lv_ZonaList.Items.Add(zone);
-            }
-        }
-
-        private void UpdateTotalCapacity()
-        {
+            int cap = 0;
             if (seatButtons != null)
             {
                 int totalCapacity = seatButtons.GetLength(0) * seatButtons.GetLength(1);
                 Tb_SalaCapacity.Text = totalCapacity.ToString();
+                cap = totalCapacity;
             }
+
+            return cap;
+        }
+
+        private void GV_Zones_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+           
+        }
+
+        private void Lv_ZonaList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Lv_ZonaList.SelectedItem is Zona zona)
+            {
+                selectedZone = zona;
+            }
+          
+                Tb_ZonaName.Text = selectedZone.Nom;
+                Tb_ZonaCapacity.Text = selectedZone.Capacitat.ToString();
+                ZonaColorPicker.Color = ConvertToUIColor(selectedZone.Z_Color);
+                Btn_ColorPicker.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
+            
+        
         }
     }
 }

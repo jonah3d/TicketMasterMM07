@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <NavigationView x:Name="MainNavigation" >
+    <NavigationView x:Name="MainNavigation" PaneDisplayMode="LeftCompact">
         <NavigationView.MenuItems>
             <NavigationViewItem Icon="Home" Content="Home" Tag="HomePage" />
             <NavigationViewItem Icon="Calendar"  Content="Create Event" Tag="CreateEventPage">

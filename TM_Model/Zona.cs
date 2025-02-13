@@ -10,20 +10,22 @@ namespace TM_Model
 {
     public class Zona
     {
-        private long id;
-        private string nom;
-        private string desc;
-        private List<Cadira> cadires;
-        private int capacitat;
-        public  Color color { get; set; }
+       
+        public long Id { get; set; }
+        public string Nom { get; set; }
+        public string Desc { get; set; }
+        public List<Cadira> Cadires { get; set; }
+        public int Capacitat { get; set; }
+        public  Color Z_Color { get; set; }
+     
 
         public Zona(string nom, int capacitat, Color color)
         {
-            this.nom = nom;
-            this.capacitat = capacitat;
-            this.color = color;
+            this.Nom = nom;
+            this.Capacitat = capacitat;
+            this.Z_Color = color;
+            this.Cadires = new List<Cadira>();
         }
+
     }
-
-
 }

@@ -5,8 +5,14 @@
     xmlns:local="using:TM_View.View"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:z="using:TM_View.Convertors"
     mc:Ignorable="d"
+    
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <z:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter"/>
+    </Page.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -36,7 +42,7 @@
                 </StackPanel>
 
                 <RelativePanel>
-                    <GridView Width="800" Height="700" Background="Yellow" Margin="0,50,0,0" x:Name="GV_Zones">
+                    <GridView Width="800" Height="700"  Margin="0,50,0,0" x:Name="GV_Zones" Tapped="GV_Zones_Tapped">
                         <GridViewItem>
 
                         </GridViewItem>
@@ -89,12 +95,28 @@
 
             <StackPanel Orientation="Horizontal" Margin="20,50,0,0">
                 <TextBlock Text="Capacity:"  FontSize="24" FontWeight="Bold"/>
-                <TextBox x:Name="Tb_SalaCapacity" Width="150" Margin="50,0,0,0"/>
+                <TextBox x:Name="Tb_ZonaCapacity" Width="150" Margin="50,0,0,0"/>
+             
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="20,50,0,0">
+                <TextBlock Text="Total Capacity:"  FontSize="24" FontWeight="Bold"/>
+                <TextBlock x:Name="Tb_SalaCapacity" FontSize="24" FontWeight="Bold" Foreground="Red" Margin="30,0,0,0"/>
             </StackPanel>
 
             <TextBlock Text="List Of Zones" FontSize="24" FontWeight="Bold" Margin="20,100,0,0"/>
             <RelativePanel>
-                <ListView x:Name="Lv_ZonaList" Width="300" Height="500"/>
+                <ListView x:Name="Lv_ZonaList" Width="300" Height="500" SelectionChanged="Lv_ZonaList_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Nom}"/>
+                                <Rectangle Width="25" Height="25" Fill="{Binding Z_Color,Converter={StaticResource ColorToSolidColorBrushConverter}}" Margin="20,0,0,0" />
+
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
                 <Button x:Name="Btn_AddZona" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="Lv_ZonaList" Margin="20,0,0,0" Click="Btn_AddZona_Click">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;"/>
                 </Button>
