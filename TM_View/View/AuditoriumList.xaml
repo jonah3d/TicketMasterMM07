@@ -22,7 +22,7 @@
 
         </StackPanel>
 
-        <RelativePanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <RelativePanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0">
             <controls:DataGrid x:Name="Dg_Salas" 
              Height="600" Width="1000"
              AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="Dg_Salas_SelectionChanged"  SelectionMode="Single">
@@ -39,6 +39,11 @@
             <Button Width="50" Height="50" x:Name="Btn_AddSala" CornerRadius="100" Click="Btn_AddSala_Click"  Margin="20,0,0,0" RelativePanel.RightOf="Dg_Salas">
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
             </Button>
+
+            <Button Width="50" Height="50" x:Name="Btn_EditSala" CornerRadius="100" Click="Btn_EditSala_Click"  Margin="20,20,0,0" RelativePanel.RightOf="Dg_Salas"  RelativePanel.Below="Btn_AddSala" >
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE70F;"/>
+            </Button>
+
             <Button Width="50" Height="50" x:Name="Btn_DelSala" CornerRadius="100" Click="Btn_DelSala_Click" Margin="20,0,0,0" RelativePanel.RightOf="Dg_Salas" RelativePanel.AlignBottomWith="Dg_Salas">
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
             </Button>

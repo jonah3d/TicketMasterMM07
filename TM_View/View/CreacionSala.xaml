@@ -41,11 +41,12 @@
 
                         </GridViewItem>
                     </GridView>
-                    <Button x:Name="Btn_PaintZone" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="GV_Zones" Margin="20,50,0,0" >
+                    <Button x:Name="Btn_PaintZone" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="GV_Zones" Margin="20,50,0,0" Click="Btn_PaintZone_Click">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE771;"/>
                     </Button>
 
-                    <Button x:Name="Btn_EraseZone" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="GV_Zones" Margin="20,0,0,0" RelativePanel.AlignBottomWith="GV_Zones">
+                    <Button x:Name="Btn_EraseZone" CornerRadius="100" Width="50" Height="50" Click="Btn_EraseZone_Click"
+                            RelativePanel.RightOf="GV_Zones" Margin="20,0,0,0" RelativePanel.AlignBottomWith="GV_Zones">
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE75C;"/>
                     </Button>
 
@@ -81,7 +82,7 @@
                         </Flyout>
                     </Button.Flyout>
                 </Button>
-                <Button x:Name="Btn_ClearColorSel" Margin="20,0,0,0" Width="40" Height="40" CornerRadius="100">
+                <Button x:Name="Btn_ClearColorSel" Margin="20,0,0,0" Width="40" Height="40" CornerRadius="100" Click="Btn_ClearColorSel_Click">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE10A;"/>
                 </Button>
             </StackPanel>
@@ -94,10 +95,11 @@
             <TextBlock Text="List Of Zones" FontSize="24" FontWeight="Bold" Margin="20,100,0,0"/>
             <RelativePanel>
                 <ListView x:Name="Lv_ZonaList" Width="300" Height="500"/>
-                <Button x:Name="Btn_AddZona" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="Lv_ZonaList" Margin="20,0,0,0">
+                <Button x:Name="Btn_AddZona" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="Lv_ZonaList" Margin="20,0,0,0" Click="Btn_AddZona_Click">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC8;"/>
                 </Button>
-                <Button x:Name="Btn_DelZona" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="Lv_ZonaList" Margin="20,0,0,0" RelativePanel.AlignBottomWith="Lv_ZonaList">
+                <Button x:Name="Btn_DelZona" CornerRadius="100" Width="50" Height="50" RelativePanel.RightOf="Lv_ZonaList" Margin="20,0,0,0" Click="Btn_DelZona_Click"
+                        RelativePanel.AlignBottomWith="Lv_ZonaList">
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xECC9;"/>
                 </Button>
             </RelativePanel>
