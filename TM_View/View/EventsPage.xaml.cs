@@ -155,5 +155,49 @@ namespace TM_View.View
            
             Btn_AddEvent.IsEnabled = !hasSelection;
         }
+
+        private async void Btn_EventSearch_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+             var searchedEvent = repository.GetEventByName(SearchBox.Text);
+                if (searchedEvent != null)
+                {
+                    events.Clear();
+                    events.Add(searchedEvent);
+                }
+                else
+                {
+                    ContentDialog errorDialog = new ContentDialog
+                    {
+                        Title = "Error",
+                        Content = "No Event With The Specified Name In The Database",
+                        CloseButtonText = "Ok"
+                    };
+                    await errorDialog.ShowAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = ex.Message,
+                    CloseButtonText = "Ok"
+                };
+                await errorDialog.ShowAsync();
+            }
+
+            
+        }
+
+        private void FI_clearsearch_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            events.Clear();
+            SearchBox.ClearValue(TextBox.TextProperty);
+            loadAllEvents();
+
+        }
     }
 }

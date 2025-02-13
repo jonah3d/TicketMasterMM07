@@ -1,0 +1,49 @@
+﻿<Page
+    x:Class="TM_View.View.AuditoriumList"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TM_View.View"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Auditorium List" FontSize="60" FontWeight="Bold"  HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Padding="10">
+            <TextBlock Text="Search Auditorium" FontSize="36" FontWeight="Bold" Margin="0,0,10,0" />
+            <TextBox x:Name="Sb_SearchBox" Width="500" PlaceholderText="Auditorium Name" Margin="0,0,10,0"/>
+            <Button Width="50" Height="50" x:Name="Btn_AuditoriumSearch" Click="Btn_AuditoriumSearch_Click" CornerRadius="100"  Margin="20,0,0,0">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE721;"/>
+            </Button>
+            <Button Width="50" Height="50" x:Name="Btn_SearchClear" CornerRadius="100" Click="Btn_SearchClear_Click"  Margin="20,0,0,0">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;"/>
+            </Button>
+
+        </StackPanel>
+
+        <RelativePanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <controls:DataGrid x:Name="Dg_Salas" 
+             Height="600" Width="1000"
+             AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="Dg_Salas_SelectionChanged"  SelectionMode="Single">
+
+                <controls:DataGrid.Columns>
+                    <controls:DataGridTextColumn Header="Event Id" Binding="{Binding Id}" />
+                    <controls:DataGridTextColumn Header="Event Id" Binding="{Binding Nom}" />
+                    <controls:DataGridTextColumn Header="Event Id" Binding="{Binding Municipi}" />
+                    <controls:DataGridTextColumn Header="Event Id" Binding="{Binding Adreca}" />
+                </controls:DataGrid.Columns>
+
+            </controls:DataGrid>
+
+            <Button Width="50" Height="50" x:Name="Btn_AddSala" CornerRadius="100" Click="Btn_AddSala_Click"  Margin="20,0,0,0" RelativePanel.RightOf="Dg_Salas">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
+            </Button>
+            <Button Width="50" Height="50" x:Name="Btn_DelSala" CornerRadius="100" Click="Btn_DelSala_Click" Margin="20,0,0,0" RelativePanel.RightOf="Dg_Salas" RelativePanel.AlignBottomWith="Dg_Salas">
+                <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74D;"/>
+            </Button>
+
+        </RelativePanel>
+        
+    </StackPanel>
+</Page>

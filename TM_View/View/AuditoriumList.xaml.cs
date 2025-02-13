@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Foundation;
+using Windows.Foundation.Collections;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Navigation;
+
+// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
+
+namespace TM_View.View
+{
+    /// <summary>
+    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// </summary>
+    public sealed partial class AuditoriumList : Page
+    {
+        public AuditoriumList()
+        {
+            this.InitializeComponent();
+        }
+
+        private void Btn_AuditoriumSearch_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_SearchClear_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Dg_Salas_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void Btn_AddSala_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Btn_DelSala_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
+}

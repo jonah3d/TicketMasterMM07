@@ -86,6 +86,9 @@ namespace TM_View
                             case "EventsPage":
                             contentFrame.Navigate(typeof(EventsPage));
                             break;
+                            case "AuditoriumList":
+                            contentFrame.Navigate(typeof(AuditoriumList));
+                            break;
                     }
                 }
             }

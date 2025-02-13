@@ -20,6 +20,9 @@ namespace TM_Database.Repository
         ObservableCollection<Event> GetAllArtsEvent();
         ObservableCollection<Event> GetAllOtherEvent();
         ObservableCollection<Sala> GetAllSalas();
+        
+        Event GetEventByName(string name);
+
         Boolean CreateEvent(Event e);
         Boolean DeleteEvent(Event e);
         Boolean UpdateEvent(Event e);

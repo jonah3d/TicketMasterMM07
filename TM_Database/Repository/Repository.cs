@@ -621,7 +621,7 @@ namespace TM_Database.Repository
                                     long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
-                                    string performer = reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
                                     string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
                                     DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
                                     TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
@@ -651,6 +651,74 @@ namespace TM_Database.Repository
 
             }
 
+        }
+
+        public Event GetEventByName(string name)
+        {
+            Event e = null;
+            try
+            {
+                using (MySQLDBContext context = new MySQLDBContext())
+                {
+                    using(var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"select e.Evt_Id, e.Evt_Name, e.Evt_Description, e.Evt_Performer, e.Evt_Image, e.Evt_Date, e.Evt_Time, 
+                                    et.Type_Name, s.Sal_Name, es.St_Name
+                                     from event e
+                             join event_type et on e.Evt_Type_Id = et.Type_Id
+                             join event_state es on e.Evt_Estat_Id = es.St_Id
+                             join sala s on e.Evt_Sala_Id = s.Sal_Id
+
+where Evt_Name like @name";
+                            consulta.Parameters.Add(new MySqlParameter("@name", "%" + name + "%"));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
+                                    string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
+                                    string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
+                                    string imatge = reader.GetString(reader.GetOrdinal("Evt_Image"));
+                                    DateTime data = reader.GetDateTime(reader.GetOrdinal("Evt_Date"));
+                                    TimeSpan time = ((MySqlDataReader)reader).GetTimeSpan(reader.GetOrdinal("Evt_Time"));
+
+                                    string type = reader.GetString(reader.GetOrdinal("Type_Name"));
+                                    string sala = reader.GetString(reader.GetOrdinal("Sal_Name"));
+                                    Sala sala1 = new Sala(sala);
+                                    string estat = reader.GetString(reader.GetOrdinal("St_Name"));
+
+                                    // Convert string to enum
+                                    TipusEvent tipusEvent = (TipusEvent)Enum.Parse(typeof(TipusEvent), type, true);
+                                    Estat estat1 = (Estat)Enum.Parse(typeof(Estat), estat, true);
+
+
+                                     e = new Event(id, nom, desc, performer, imatge, data, time, tipusEvent, sala1, estat1);
+                                   
+                                }
+
+                                
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Can't Get Requested Sala By Name : {name}. {ex.Message}");
+            }
+
+            return e;
         }
 
         public int GetSalaId(string name)
@@ -776,7 +844,25 @@ namespace TM_Database.Repository
 
         public bool UpdateEvent(Event e)
         {
-            throw new NotImplementedException();
+            bool ans = false;
+
+            try
+            {
+
+                using(MySQLDBContext context = new MySQLDBContext())
+                {
+                    using(var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                    }
+                }
+
+            }catch(Exception ex)
+            {
+                throw new Exception($"Can't Update Selected Event {ex.Message}");
+            }
+
+            return ans;
         }
 
         ObservableCollection<Sala> IRepository.GetAllSalas()
