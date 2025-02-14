@@ -182,51 +182,69 @@ namespace TM_View.View
                     CloseButtonText = "Ok"
                 };
                 await errorDialog.ShowAsync();
-            }else if( selectedZone != null)
-            {
-                if (sender is Button seatButton)
-                {
-
-                    var ZoneCapacity = selectedZone.Capacitat;
-
-                    for(int i = 0; i < seatButtons.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < seatButtons.GetLength(1); j++)
-                        {
-                            if (seatButtons[i, j] == seatButton)
-                            {
-                                if (isPaintMode)
-                                {
-                                    if (CountSeatsOfColor(ConvertToUIColor(selectedZone.Z_Color)) >= ZoneCapacity)
-                                    {
-                                        ContentDialog errorDialog = new ContentDialog
-                                        {
-                                            Title = "Alert!",
-                                            Content = "Zone Capacity Exceeded",
-                                            CloseButtonText = "Ok"
-                                        };
-                                        await errorDialog.ShowAsync();
-                                        return;
-                                    }
-                                }
-                                else
-                                {
-                                    seatButton.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-
-                    seatButton.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
-
-                    Cadira newSeat = new Cadira();
-                    selectedZone.Cadires.Add(newSeat);
-                }
+                return;
             }
 
-        }
+            if (sender is Button seatButton)
+            {
+                int row = -1, col = -1;
 
+                // Find the position of the clicked button
+                for (int i = 0; i < seatButtons.GetLength(0); i++)
+                {
+                    for (int j = 0; j < seatButtons.GetLength(1); j++)
+                    {
+                        if (seatButtons[i, j] == seatButton)
+                        {
+                            row = i;
+                            col = j;
+                            break;
+                        }
+                    }
+                    if (row != -1) break;
+                }
+
+                if (isPaintMode)
+                {
+                   
+                    if (CountSeatsOfColor(ConvertToUIColor(selectedZone.Z_Color)) >= selectedZone.Capacitat)
+                    {
+                        ContentDialog errorDialog = new ContentDialog
+                        {
+                            Title = "Alert!",
+                            Content = "Zone Capacity Exceeded",
+                            CloseButtonText = "Ok"
+                        };
+                        await errorDialog.ShowAsync();
+                        return;
+                    }
+
+                  
+                    var existingSeat = selectedZone.Cadires.FirstOrDefault(c => c.X == col && c.Y == row);
+                    if (existingSeat == null)
+                    {
+                      
+                        Cadira newSeat = new Cadira { X = col, Y = row };
+                        selectedZone.Cadires.Add(newSeat);
+                        seatButton.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
+                    }
+                }
+                else 
+                {
+                    var uiColor = ConvertToUIColor(selectedZone.Z_Color);
+                    if (((SolidColorBrush)seatButton.Background).Color == uiColor)
+                    {
+                       
+                        var seatToRemove = selectedZone.Cadires.FirstOrDefault(c => c.X == col && c.Y == row);
+                        if (seatToRemove != null)
+                        {
+                            selectedZone.Cadires.Remove(seatToRemove);
+                            seatButton.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
+                        }
+                    }
+                }
+            }
+        }
         private void Btn_DelZona_Click(object sender, RoutedEventArgs e)
         {
             if (Lv_ZonaList.SelectedItem is Zona selectedZone)

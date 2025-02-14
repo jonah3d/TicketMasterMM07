@@ -7,7 +7,7 @@ namespace TM_Model
 {
     public class Event
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
         public string Nom { get; set; }
         public string Protagonista { get; set; }
         public string ImatgePath { get; set; }
@@ -23,7 +23,7 @@ namespace TM_Model
 
         public Event() { }
 
-        public Event(long id, string nom, string desc, string protagonista, string imatgePath,
+        public Event(int id, string nom, string desc, string protagonista, string imatgePath,
                     DateTime data, TimeSpan time, TipusEvent tipusEvent, Sala sala, Estat estat)
         {
             Id = id;
@@ -51,6 +51,21 @@ namespace TM_Model
             Sala = sala;
             ImatgePath = imagePath;
       
+        }
+
+        public Event(int id,string name, string description, DateTime date, TimeSpan time, TipusEvent eventType, Estat status, string performer, Sala sala, string imagePath)
+        {
+            Id = id;
+            Nom = name;
+            Desc = description;
+            Data = date;
+            Time = time;
+            Tipus = eventType;
+            Status = status;
+            Protagonista = performer;
+            Sala = sala;
+            ImatgePath = imagePath;
+
         }
     }
 }

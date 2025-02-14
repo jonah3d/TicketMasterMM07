@@ -8,9 +8,9 @@ namespace TM_Model
 {
     public class Cadira
     {
-        private string desc;
-        private long id;
-        private int x;
-        private int y;
+        public string Desc { get; set; }
+        public long Id { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
     }
 }

@@ -70,9 +70,23 @@
 
             <StackPanel Orientation="Vertical" VerticalAlignment="Center"  HorizontalAlignment="Center" >
                 <Button Content="Edit" Width="100" Height="50" 
-                 x:Name="Btn_CreateEvent" Click="Btn_CreateEvent_Click" VerticalAlignment="Center"/>
+                 x:Name="Btn_EditEvent" Click="Btn_EditEvent_Click" VerticalAlignment="Center"/>
             </StackPanel>
 
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Grid.Column="1" >
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Tarifa Nom:" FontSize="24" FontWeight="Bold"/>
+                <TextBox  Width="200" Margin="50,0,0,0" x:Name="Tb_nom"/>
+                <TextBlock Text="Tarifa Price:" FontSize="24" FontWeight="Bold" Margin="20,0,0,0"/>
+                <TextBox  Width="200" Margin="20,0,0,0" x:Name="Tb_price"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Desc:" FontSize="24" FontWeight="Bold"/>
+                <TextBox  Width="200" Height="200" Margin="120,0,0,0" x:Name="Tb_desc" TextWrapping="Wrap"/>
+            </StackPanel>
+            
         </StackPanel>
 
     </Grid>

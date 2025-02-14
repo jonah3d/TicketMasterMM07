@@ -139,7 +139,7 @@ namespace TM_View.View
               ShowErrorDialogue(ex);
             }
 
-            RTB_Error.Text = $"{name} {description} {date} {time} {eventType} {status} {performer} {sala.Nom} {imagePath}";
+            
         }
         private static async void ShowErrorDialogue(Exception ex)
         {

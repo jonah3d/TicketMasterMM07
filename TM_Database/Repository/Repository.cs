@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Linq.Expressions;
 using System.Text;
+using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using TM_Model;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TM_Database.Repository
 {
@@ -159,7 +161,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -225,7 +227,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -289,7 +291,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -354,7 +356,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -419,7 +421,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -488,7 +490,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -553,7 +555,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -618,7 +620,7 @@ namespace TM_Database.Repository
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -682,7 +684,7 @@ where Evt_Name like @name";
                             {
                                 while (reader.Read())
                                 {
-                                    long id = reader.GetInt64(reader.GetOrdinal("Evt_Id"));
+                                    int id = reader.GetInt32(reader.GetOrdinal("Evt_Id"));
                                     string nom = reader.GetString(reader.GetOrdinal("Evt_Name"));
                                     string desc = reader.GetString(reader.GetOrdinal("Evt_Description"));
                                     string performer = reader.IsDBNull(reader.GetOrdinal("Evt_Performer")) ? string.Empty : reader.GetString(reader.GetOrdinal("Evt_Performer"));
@@ -845,25 +847,87 @@ where Evt_Name like @name";
         public bool UpdateEvent(Event e)
         {
             bool ans = false;
+            int id = e.Id;
+            string name = e.Nom;
+            string description = e.Desc;
+            string performer = e.Protagonista;
+            string image = e.ImatgePath;
+            DateTime date = e.Data;
+            TimeSpan time = e.Time;
+            string type = e.Tipus.ToString();
+            int typeID = GetTipusId(type);
+            Sala sala = e.Sala;
+            int salaId = GetSalaId(sala.Nom);
+            string estat = e.Status.ToString();
+            int estatID = GetStatusId(estat);
 
             try
             {
-
-                using(MySQLDBContext context = new MySQLDBContext())
+                using (MySQLDBContext context = new MySQLDBContext())
                 {
-                    using(var connection = context.Database.GetDbConnection())
+                    using (var connection = context.Database.GetDbConnection())
                     {
                         connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var transaction = connection.BeginTransaction())
+                        {
+                            try
+                            {
+                                using (var consulta = connection.CreateCommand())
+                                {
+                                    consulta.Transaction = transaction;
+                                    consulta.CommandText = @"UPDATE Event 
+                                                     SET Evt_Name = @name, 
+                                                         Evt_Description = @description, 
+                                                         Evt_Performer = @performer, 
+                                                         Evt_Image = @image, 
+                                                         Evt_Date = @date, 
+                                                         Evt_Time = @time, 
+                                                         Evt_Type_Id = @type, 
+                                                         Evt_Sala_Id = @sala, 
+                                                         Evt_Estat_Id = @estat
+                                                     WHERE Evt_Id = @Id";
+                                    consulta.Parameters.Add(new MySqlParameter("@name", name));
+                                    consulta.Parameters.Add(new MySqlParameter("@description", description));
+                                    consulta.Parameters.Add(new MySqlParameter("@performer", performer));
+                                    consulta.Parameters.Add(new MySqlParameter("@image", image));
+                                    consulta.Parameters.Add(new MySqlParameter("@date", date));
+                                    consulta.Parameters.Add(new MySqlParameter("@time", time));
+                                    consulta.Parameters.Add(new MySqlParameter("@type", typeID));
+                                    consulta.Parameters.Add(new MySqlParameter("@sala", salaId));
+                                    consulta.Parameters.Add(new MySqlParameter("@estat", estatID));
+                                    consulta.Parameters.Add(new MySqlParameter("@Id", id));
+
+                                    int rowsAffected = consulta.ExecuteNonQuery();
+                                    if (rowsAffected > 0)
+                                    {
+                                        ans = true;
+                                    }
+                                }
+
+                                transaction.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                transaction.Rollback();
+                                throw new Exception($"Can't Update Event: {ex.Message}");
+                            }
+                        }
                     }
                 }
-
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
-                throw new Exception($"Can't Update Selected Event {ex.Message}");
+                throw new Exception($"Can't Update Selected Event: {ex.Message}");
             }
 
             return ans;
         }
+
 
         ObservableCollection<Sala> IRepository.GetAllSalas()
         {
