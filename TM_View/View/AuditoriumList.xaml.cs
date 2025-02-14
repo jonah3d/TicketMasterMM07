@@ -27,6 +27,7 @@ namespace TM_View.View
         private IRepository eventRepository;
 
         private ObservableCollection<Sala> salas { get; set; } = new ObservableCollection<Sala>();
+        private Sala selectedSala;
 
         public AuditoriumList()
         {
@@ -78,9 +79,37 @@ namespace TM_View.View
             }
         }
 
-        private void Btn_DelSala_Click(object sender, RoutedEventArgs e)
+        private async void Btn_DelSala_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                selectedSala = Dg_Salas.SelectedItem as Sala;
+                if (selectedSala != null)
+                {
+                    if (eventRepository.DeleteSala(selectedSala))
+                    {
+                        ContentDialog successcontent = new ContentDialog
+                        {
+                            Title = "Success",
+                            Content = $"Successfully Deleted Sala {selectedSala.Nom}",
+                            CloseButtonText = "Ok"
+                        };
+                        await successcontent.ShowAsync();
+                    }
 
+                    loadSalas();
+                }
+            }
+            catch (Exception ex)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"Error Deleteing Sala {ex.Message}",
+                    CloseButtonText = "Ok"
+                };
+                await errorDialog.ShowAsync();
+            }
         }
         public void loadSalas()
         {

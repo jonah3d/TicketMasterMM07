@@ -26,8 +26,12 @@ namespace TM_Database.Repository
         Boolean CreateEvent(Event e);
         Boolean DeleteEvent(Event e);
         Boolean UpdateEvent(Event e);
+        Boolean CreateSala(Sala s);
+        Boolean DeleteSala(Sala s);
+
         int GetSalaId(String name);
         int GetStatusId(String name);
         int GetTipusId(String name);
+
     }
 }

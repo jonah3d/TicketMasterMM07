@@ -95,6 +95,72 @@ namespace TM_Database.Repository
             }
         }
 
+        public bool CreateSala(Sala s)
+        {
+            if (s == null)
+            {
+                throw new Exception(" Can't Pass A Null Sala");
+            }
+
+            string name = s.Nom;
+            string municipi = s.Municipi;
+            string adreca = s.Adreca;
+            bool teMapa = s.TeMapa;
+            int totalSeats = s.Seats;
+            int numFiles = s.NumFiles;
+            int numColumnes = s.NumColumnes;
+
+            try
+            {
+
+                using (MySQLDBContext context = new MySQLDBContext())
+                {
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+                        using (var transaction = connection.BeginTransaction())
+                        {
+                            try
+                            {
+                                using (var consulta = connection.CreateCommand())
+                                {
+                                    consulta.Transaction = transaction;
+                                    consulta.CommandText = @"insert into sala (Sal_Name, Sal_Municipality, Sal_Address, Sal_MapAvail, Sal_Seats, Sal_Rows, Sal_Col) 
+                                                        values (@name, @municipi, @adreca, @teMapa, @totalSeats, @numFiles, @numColumnes)";
+                                    consulta.Parameters.Add(new MySqlParameter("@name", name));
+                                    consulta.Parameters.Add(new MySqlParameter("@municipi", municipi));
+                                    consulta.Parameters.Add(new MySqlParameter("@adreca", adreca));
+                                    consulta.Parameters.Add(new MySqlParameter("@teMapa", teMapa));
+                                    consulta.Parameters.Add(new MySqlParameter("@totalSeats", totalSeats));
+                                    consulta.Parameters.Add(new MySqlParameter("@numFiles", numFiles));
+                                    consulta.Parameters.Add(new MySqlParameter("@numColumnes", numColumnes));
+                                    consulta.ExecuteNonQuery();
+                                }
+                                transaction.Commit();
+                                return true;
+                            }
+                            catch (Exception ex)
+                            {
+                                transaction.Rollback();
+                                throw new Exception($"Can't Create Sala {ex.Message}");
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Can't Create Sala {e.Message}");
+
+            }
+        }
+
         public bool DeleteEvent(Event e)
         {
             using(MySQLDBContext context = new MySQLDBContext())
@@ -124,6 +190,41 @@ namespace TM_Database.Repository
                         {
                             transaction.Rollback();
                             throw new Exception($"Can't Delete Event {ex.Message}");
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool DeleteSala(Sala s)
+        {
+            using (MySQLDBContext context = new MySQLDBContext())
+            {
+                using (var connection = context.Database.GetDbConnection())
+                {
+                    connection.Open();
+                    if (connection.State != System.Data.ConnectionState.Open)
+                    {
+                        throw new Exception("Can't Open Connection");
+                    }
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            using (var consulta = connection.CreateCommand())
+                            {
+                                consulta.Transaction = transaction;
+                                consulta.CommandText = @"delete from sala where Sal_Id = @id";
+                                consulta.Parameters.Add(new MySqlParameter("@id", s.Id));
+                                consulta.ExecuteNonQuery();
+                            }
+                            transaction.Commit();
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            throw new Exception($"Can't Delete Sala {ex.Message}");
                         }
                     }
                 }

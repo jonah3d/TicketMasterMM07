@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TM_Database.Repository;
 using TM_Model;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -29,11 +30,13 @@ namespace TM_View.View
         private Button[,] seatButtons;
         private static SolidColorBrush grey = new SolidColorBrush(Windows.UI.Colors.LightGray);
         private Zona selectedZone;
+        private Repository repository;
 
         public CreacionSala()
         {
             this.InitializeComponent();
             InitializeControls();
+            repository = new Repository();
 
             Lv_ZonaList.ItemsSource = zones;
 
@@ -41,7 +44,8 @@ namespace TM_View.View
         }
         private void InitializeControls()
         {
-      
+            Tg_Map.IsOn = true;
+
             for (int i = 1; i <= 50; i++)
             {
                 Cmb_SalaRow.Items.Add(i);
@@ -51,17 +55,17 @@ namespace TM_View.View
             Cmb_SalaRow.SelectedIndex = 0;
             Cmb_SalaCol.SelectedIndex = 0;
 
-       
+
             Cmb_SalaRow.SelectionChanged += UpdateSeatingGrid;
             Cmb_SalaCol.SelectionChanged += UpdateSeatingGrid;
             Lv_ZonaList.SelectionChanged += Lv_ZonaList_SelectionChanged;
             Btn_PaintZone.Click += Btn_PaintZone_Click;
             Btn_EraseZone.Click += Btn_EraseZone_Click;
 
-      
+
             UpdateSeatingGrid(null, null);
         }
-    
+
         private System.Drawing.Color ConvertToDrawingColor(Windows.UI.Color uiColor)
         {
             return System.Drawing.Color.FromArgb(uiColor.A, uiColor.R, uiColor.G, uiColor.B);
@@ -83,10 +87,10 @@ namespace TM_View.View
             int rows = (int)Cmb_SalaRow.SelectedItem;
             int cols = (int)Cmb_SalaCol.SelectedItem;
 
-    
+
             GV_Zones.Items.Clear();
 
-         
+
             var uniformGrid = new Grid();
             for (int i = 0; i < rows; i++)
                 uniformGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) });
@@ -95,7 +99,7 @@ namespace TM_View.View
 
             seatButtons = new Button[rows, cols];
 
-       
+
             for (int r = 0; r < rows; r++)
             {
                 for (int c = 0; c < cols; c++)
@@ -120,7 +124,7 @@ namespace TM_View.View
             gridViewItem.Content = uniformGrid;
             GV_Zones.Items.Add(gridViewItem);
 
-      
+
             UpdateTotalCapacity();
         }
         private void ZonaColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
@@ -130,10 +134,10 @@ namespace TM_View.View
         }
         private async void Btn_PaintZone_Click(object sender, RoutedEventArgs e)
         {
-     
-                isPaintMode = true;
-                ZonaColorPicker.Color = currentUIColor;
-            
+
+            isPaintMode = true;
+            ZonaColorPicker.Color = currentUIColor;
+
         }
         private void Btn_EraseZone_Click(object sender, RoutedEventArgs e)
         {
@@ -206,7 +210,7 @@ namespace TM_View.View
 
                 if (isPaintMode)
                 {
-                   
+
                     if (CountSeatsOfColor(ConvertToUIColor(selectedZone.Z_Color)) >= selectedZone.Capacitat)
                     {
                         ContentDialog errorDialog = new ContentDialog
@@ -219,22 +223,22 @@ namespace TM_View.View
                         return;
                     }
 
-                  
+
                     var existingSeat = selectedZone.Cadires.FirstOrDefault(c => c.X == col && c.Y == row);
                     if (existingSeat == null)
                     {
-                      
+
                         Cadira newSeat = new Cadira { X = col, Y = row };
                         selectedZone.Cadires.Add(newSeat);
                         seatButton.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
                     }
                 }
-                else 
+                else
                 {
                     var uiColor = ConvertToUIColor(selectedZone.Z_Color);
                     if (((SolidColorBrush)seatButton.Background).Color == uiColor)
                     {
-                       
+
                         var seatToRemove = selectedZone.Cadires.FirstOrDefault(c => c.X == col && c.Y == row);
                         if (seatToRemove != null)
                         {
@@ -251,7 +255,7 @@ namespace TM_View.View
             {
                 var uiColor = ConvertToUIColor(selectedZone.Z_Color);
 
-           
+
                 foreach (var button in seatButtons)
                 {
                     if (((SolidColorBrush)button.Background).Color == uiColor)
@@ -261,7 +265,7 @@ namespace TM_View.View
                 }
 
                 zones.Remove(selectedZone);
-       
+
                 UpdateTotalCapacity();
             }
         }
@@ -274,7 +278,7 @@ namespace TM_View.View
                     count++;
             }
             return count;
-        }   
+        }
 
         private int UpdateTotalCapacity()
         {
@@ -291,7 +295,7 @@ namespace TM_View.View
 
         private void GV_Zones_Tapped(object sender, TappedRoutedEventArgs e)
         {
-           
+
         }
 
         private void Lv_ZonaList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -300,13 +304,98 @@ namespace TM_View.View
             {
                 selectedZone = zona;
             }
-          
-                Tb_ZonaName.Text = selectedZone.Nom;
-                Tb_ZonaCapacity.Text = selectedZone.Capacitat.ToString();
-                ZonaColorPicker.Color = ConvertToUIColor(selectedZone.Z_Color);
-                Btn_ColorPicker.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
+
+            Tb_ZonaName.Text = selectedZone.Nom;
+            Tb_ZonaCapacity.Text = selectedZone.Capacitat.ToString();
+            ZonaColorPicker.Color = ConvertToUIColor(selectedZone.Z_Color);
+            Btn_ColorPicker.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
+
+
+        }
+
+        private void Tg_Map_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (Tg_Map.IsOn)
+            {
+                GV_Zones.Visibility = Visibility.Visible;
+                Cmb_SalaCol.Visibility = Visibility.Visible;
+                Cmb_SalaRow.Visibility = Visibility.Visible;
+                Btn_PaintZone.Visibility = Visibility.Visible;
+                Btn_EraseZone.Visibility = Visibility.Visible;
+                TB_X.Visibility = Visibility.Visible;
+                Sp_Zone.Visibility = Visibility.Visible;
+            }
+            else if (!Tg_Map.IsOn)
+            {
+
+
+
+                GV_Zones.Visibility = Visibility.Collapsed;
+                Cmb_SalaCol.Visibility = Visibility.Collapsed;
+                Cmb_SalaRow.Visibility = Visibility.Collapsed;
+                Btn_PaintZone.Visibility = Visibility.Collapsed;
+                Btn_EraseZone.Visibility = Visibility.Collapsed;
+                TB_X.Visibility = Visibility.Collapsed;
+                Sp_Zone.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
+        private async void Btn_CreateSala_Click(object sender, RoutedEventArgs e)
+        {
+            var salaname = Tb_salaname.Text;
+            var salamunicipi = Tb_SalMunicipi.Text;
+            var salaadreca = Tb_SalAdreca.Text;
+            var map = Tg_Map.IsOn;
+            var totalsalacapacity = Int32.Parse(Tb_SalaCapacity.Text);
+            var numfiles = Int32.Parse(Cmb_SalaRow.SelectedItem.ToString());
+            var numcolumnes = Int32.Parse(Cmb_SalaCol.SelectedItem.ToString());
+
+            if (map == false)
+            {
+                totalsalacapacity = 0;
+                numfiles = 0;
+                numcolumnes = 0;
+            }
+
+
+            try
+            {
+                Sala sala = new Sala
+                {
+                    Nom = salaname,
+                    Municipi = salamunicipi,
+                    Adreca = salaadreca,
+                    TeMapa = map,
+                    Seats = totalsalacapacity,
+                    NumFiles = numfiles,
+                    NumColumnes = numcolumnes,
+
+                };
+               if (repository.CreateSala(sala))
+                {
+                    ContentDialog successcontent = new ContentDialog
+                    {
+                        Title = "Success",
+                        Content = $"Successfully Created Sala {sala.Nom}",
+                        CloseButtonText = "Ok"
+                    };
+                    await successcontent.ShowAsync();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"Error Creating Sala {ex.Message}",
+                    CloseButtonText = "Ok"
+                };
+               await errorDialog.ShowAsync();
+            }
+
             
-        
         }
     }
 }
