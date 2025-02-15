@@ -439,7 +439,6 @@ namespace TM_View.View
                 numcolumnes = 0;
             }
 
-
             try
             {
                 Sala sala = new Sala
@@ -451,8 +450,8 @@ namespace TM_View.View
                     Seats = totalsalacapacity,
                     NumFiles = numfiles,
                     NumColumnes = numcolumnes,
-
                 };
+
                 if (repository.CreateSala(sala))
                 {
                     var newSalaId = repository.GetSalaId(salaname);
@@ -462,13 +461,35 @@ namespace TM_View.View
                         {
                             if (repository.CreateZone(zones, newSalaId))
                             {
-                                ContentDialog successcontent = new ContentDialog
+                                // Add this new code to create seats after zones are created
+                                if (repository.CreateSeats(zones))
                                 {
-                                    Title = "Success",
-                                    Content = $"Successfully Created Sala {sala.Nom} With Zones",
-                                    CloseButtonText = "Ok"
-                                };
-                                await successcontent.ShowAsync();
+                                    ContentDialog successcontent = new ContentDialog
+                                    {
+                                        Title = "Success",
+                                        Content = $"Successfully Created Sala {sala.Nom} With Zones and Seats",
+                                        CloseButtonText = "Ok"
+                                    };
+                                    await successcontent.ShowAsync();
+                                }
+                                else
+                                {
+                                    // If CreateSeats fails, attempt to clean up
+                                    if (repository.DeleteAllSalaZones(newSalaId) && repository.DeleteSala(sala))
+                                    {
+                                        ContentDialog errorDialog = new ContentDialog
+                                        {
+                                            Title = "Error",
+                                            Content = $"Error Creating Seats. Deleting Created Sala and Zones",
+                                            CloseButtonText = "Ok"
+                                        };
+                                        await errorDialog.ShowAsync();
+                                    }
+                                    else
+                                    {
+                                        throw new Exception("Failed to delete Sala after seat creation failure");
+                                    }
+                                }
                             }
                             else
                             {
@@ -491,12 +512,14 @@ namespace TM_View.View
                         }
                         catch (Exception ex)
                         {
+                            // Clean up attempt if any step fails
+                            repository.DeleteAllSalaZones(newSalaId);
                             if (repository.DeleteSala(sala))
                             {
                                 ContentDialog errorDialog = new ContentDialog
                                 {
                                     Title = "Error",
-                                    Content = $"Error Creating Zones. Deleting Created Sala {ex.Message}",
+                                    Content = $"Error in Sala Creation Process. Deleting Created Components. {ex.Message}",
                                     CloseButtonText = "Ok"
                                 };
                                 await errorDialog.ShowAsync();
@@ -508,7 +531,6 @@ namespace TM_View.View
                         }
                     }
                 }
-            
             }
             catch (Exception ex)
             {

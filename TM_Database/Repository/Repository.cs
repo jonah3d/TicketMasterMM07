@@ -1358,6 +1358,87 @@ where Evt_Name like @name";
                     throw new Exception($"Can't Get Zone Ids {e.Message}");
                 }
          }
+
+        public bool CreateSeats(ObservableCollection<Zona> zones)
+        {
+            try
+            {
+                using (MySQLDBContext context = new MySQLDBContext())
+                {
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+
+                        using (var transaction = connection.BeginTransaction())
+                        {
+                            try
+                            {
+                                using (var command = connection.CreateCommand())
+                                {
+                                    command.Transaction = transaction;
+
+                                    foreach (var zone in zones)
+                                    {
+                                        // Get the Zone_Id for this zone - assuming it was just created
+                                        command.Parameters.Clear();
+                                        command.CommandText = "SELECT Zone_Id FROM zone WHERE Zone_Name = @zoneName AND Zone_Color = @zoneColor";
+                                        command.Parameters.Add(new MySqlParameter("@zoneName", zone.Nom));
+                                        command.Parameters.Add(new MySqlParameter("@zoneColor", ConvertToHex(zone.Z_Color)));
+
+                                        int zoneId;
+                                        using (var reader = command.ExecuteReader())
+                                        {
+                                            if (reader.Read())
+                                            {
+                                                zoneId = reader.GetInt32(0);
+                                            }
+                                            else
+                                            {
+                                                throw new Exception($"Zone {zone.Nom} not found in database");
+                                            }
+                                        }
+
+                                        // Insert each seat for this zone
+                                        foreach (var seat in zone.Cadires)
+                                        {
+                                            command.Parameters.Clear();
+                                            command.CommandText = @"
+                                        INSERT INTO seat (Seat_Description, Seat_X, Seat_Y, Seat_ZoneId)
+                                        VALUES (@description, @x, @y, @zoneId)";
+
+                                            string seatDescription = $"{(char)('A' + seat.Y)}{seat.X + 1}"; // e.g., A1, B2, etc.
+
+                                            command.Parameters.Add(new MySqlParameter("@description", seatDescription));
+                                            command.Parameters.Add(new MySqlParameter("@x", seat.X));
+                                            command.Parameters.Add(new MySqlParameter("@y", seat.Y));
+                                            command.Parameters.Add(new MySqlParameter("@zoneId", zoneId));
+
+                                            command.ExecuteNonQuery();
+                                        }
+                                    }
+                                }
+
+                                transaction.Commit();
+                                return true;
+                            }
+                            catch (Exception ex)
+                            {
+                                transaction.Rollback();
+                                throw new Exception($"Error creating seats: {ex.Message}");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error in CreateSeats: {ex.Message}");
+            }
+        }
     }
 }
 

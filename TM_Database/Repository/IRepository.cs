@@ -35,6 +35,7 @@ namespace TM_Database.Repository
         Boolean CreateChair(List<Cadira> c);
         Boolean DeleteAllChairZones(List<int> zoneIds);
         List<int>ZoneIds(int salaid);
+        Boolean CreateSeats(ObservableCollection<Zona> zones);
 
         int GetSalaId(String name);
         int GetStatusId(String name);
