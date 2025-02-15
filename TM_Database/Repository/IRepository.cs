@@ -29,6 +29,10 @@ namespace TM_Database.Repository
         Boolean CreateSala(Sala s);
         Boolean DeleteSala(Sala s);
 
+        Boolean CreateZone(ObservableCollection<Zona>z, int salaid);
+        Boolean DeleteAllSalaZones(int salaid);
+        Boolean CreateChair(List<Cadira> c);
+
         int GetSalaId(String name);
         int GetStatusId(String name);
         int GetTipusId(String name);

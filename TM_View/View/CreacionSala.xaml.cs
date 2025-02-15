@@ -80,6 +80,26 @@ namespace TM_View.View
                 drawingColor.B
             );
         }
+
+        private System.Drawing.Color ConvertFromHex(string hex)
+        {
+            if (hex.StartsWith("#"))
+            {
+                hex = hex.Substring(1);
+            }
+
+            int r = int.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+            int g = int.Parse(hex.Substring(2, 4), System.Globalization.NumberStyles.HexNumber);
+            int b = int.Parse(hex.Substring(4, 6), System.Globalization.NumberStyles.HexNumber);
+
+            return System.Drawing.Color.FromArgb(r, g, b);
+        }
+
+        private string ConvertToHex(System.Drawing.Color color)
+        {
+            return "#" + color.R.ToString("X2") + color.G.ToString("X2") + color.B.ToString("X2");
+        }
+
         private void UpdateSeatingGrid(object sender, SelectionChangedEventArgs e)
         {
             if (Cmb_SalaRow.SelectedItem == null || Cmb_SalaCol.SelectedItem == null) return;
@@ -324,6 +344,8 @@ namespace TM_View.View
                 Btn_EraseZone.Visibility = Visibility.Visible;
                 TB_X.Visibility = Visibility.Visible;
                 Sp_Zone.Visibility = Visibility.Visible;
+                Btn_CreateAuditoriumSala.Visibility = Visibility.Visible;
+                Btn_CreateSala.Visibility = Visibility.Collapsed;
             }
             else if (!Tg_Map.IsOn)
             {
@@ -337,6 +359,8 @@ namespace TM_View.View
                 Btn_EraseZone.Visibility = Visibility.Collapsed;
                 TB_X.Visibility = Visibility.Collapsed;
                 Sp_Zone.Visibility = Visibility.Collapsed;
+                Btn_CreateSala.Visibility = Visibility.Visible;
+                Btn_CreateAuditoriumSala.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -396,6 +420,106 @@ namespace TM_View.View
             }
 
             
+        }
+
+        private async void Btn_CreateAuditoriumSala_Click(object sender, RoutedEventArgs e)
+        {
+            var salaname = Tb_salaname.Text;
+            var salamunicipi = Tb_SalMunicipi.Text;
+            var salaadreca = Tb_SalAdreca.Text;
+            var map = Tg_Map.IsOn;
+            var totalsalacapacity = Int32.Parse(Tb_SalaCapacity.Text);
+            var numfiles = Int32.Parse(Cmb_SalaRow.SelectedItem.ToString());
+            var numcolumnes = Int32.Parse(Cmb_SalaCol.SelectedItem.ToString());
+
+            if (map == false)
+            {
+                totalsalacapacity = 0;
+                numfiles = 0;
+                numcolumnes = 0;
+            }
+
+
+            try
+            {
+                Sala sala = new Sala
+                {
+                    Nom = salaname,
+                    Municipi = salamunicipi,
+                    Adreca = salaadreca,
+                    TeMapa = map,
+                    Seats = totalsalacapacity,
+                    NumFiles = numfiles,
+                    NumColumnes = numcolumnes,
+
+                };
+                if (repository.CreateSala(sala))
+                {
+                    var newSalaId = repository.GetSalaId(salaname);
+                    if (newSalaId > 0)
+                    {
+                        try
+                        {
+                            if (repository.CreateZone(zones, newSalaId))
+                            {
+                                ContentDialog successcontent = new ContentDialog
+                                {
+                                    Title = "Success",
+                                    Content = $"Successfully Created Sala {sala.Nom} With Zones",
+                                    CloseButtonText = "Ok"
+                                };
+                                await successcontent.ShowAsync();
+                            }
+                            else
+                            {
+                                // If CreateZone fails, delete Sala immediately
+                                if (repository.DeleteSala(sala))
+                                {
+                                    ContentDialog errorDialog = new ContentDialog
+                                    {
+                                        Title = "Error",
+                                        Content = $"Error Creating Zones. Deleting Created Sala",
+                                        CloseButtonText = "Ok"
+                                    };
+                                    await errorDialog.ShowAsync();
+                                }
+                                else
+                                {
+                                    throw new Exception("Failed to delete Sala after zone creation failure");
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            if (repository.DeleteSala(sala))
+                            {
+                                ContentDialog errorDialog = new ContentDialog
+                                {
+                                    Title = "Error",
+                                    Content = $"Error Creating Zones. Deleting Created Sala {ex.Message}",
+                                    CloseButtonText = "Ok"
+                                };
+                                await errorDialog.ShowAsync();
+                            }
+                            else
+                            {
+                                throw new Exception($"Failed to delete Sala after error: {ex.Message}");
+                            }
+                        }
+                    }
+                }
+            
+            }
+            catch (Exception ex)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"Error Creating Sala {ex.Message}",
+                    CloseButtonText = "Ok"
+                };
+                await errorDialog.ShowAsync();
+            }
         }
     }
 }

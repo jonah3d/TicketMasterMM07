@@ -68,6 +68,9 @@
                     <TextBlock Text="X" FontSize="24" FontWeight="ExtraBold" Margin="10,0,10,0" x:Name="TB_X"/>
                     <ComboBox Width="150" x:Name="Cmb_SalaCol"/>
                     <Button Content="Create Auditorium" x:Name="Btn_CreateSala" Click="Btn_CreateSala_Click" Margin="20,0,0,0" CornerRadius="5"/>
+                    <Button Content="Create Auditorium With Zones" Margin="20,0,0,0" CornerRadius="5" 
+                            x:Name="Btn_CreateAuditoriumSala" Click="Btn_CreateAuditoriumSala_Click"
+                            />
 
                 </StackPanel>
             

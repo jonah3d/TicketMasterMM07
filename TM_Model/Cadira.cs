@@ -12,5 +12,6 @@ namespace TM_Model
         public long Id { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int ZoneId { get; set; }
     }
 }
