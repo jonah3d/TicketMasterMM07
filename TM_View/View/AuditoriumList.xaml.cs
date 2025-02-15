@@ -86,17 +86,36 @@ namespace TM_View.View
                 selectedSala = Dg_Salas.SelectedItem as Sala;
                 if (selectedSala != null)
                 {
+                    bool hasZones = eventRepository.checkSalaZones((int)selectedSala.Id);
+
+                    // If it has zones, delete them first
+                    if (hasZones)
+                    {
+                        bool zonesDeleted = eventRepository.DeleteAllSalaZones((int)selectedSala.Id);
+                        if (!zonesDeleted)
+                        {
+                            ContentDialog errorDialog = new ContentDialog
+                            {
+                                Title = "Error",
+                                Content = $"Failed to delete zones for sala {selectedSala.Nom}",
+                                CloseButtonText = "Ok"
+                            };
+                            await errorDialog.ShowAsync();
+                            return;
+                        }
+                    }
+
+                    // Now try to delete the sala
                     if (eventRepository.DeleteSala(selectedSala))
                     {
-                        ContentDialog successcontent = new ContentDialog
+                        ContentDialog successContent = new ContentDialog
                         {
                             Title = "Success",
                             Content = $"Successfully Deleted Sala {selectedSala.Nom}",
                             CloseButtonText = "Ok"
                         };
-                        await successcontent.ShowAsync();
+                        await successContent.ShowAsync();
                     }
-
                     loadSalas();
                 }
             }
@@ -105,7 +124,7 @@ namespace TM_View.View
                 ContentDialog errorDialog = new ContentDialog
                 {
                     Title = "Error",
-                    Content = $"Error Deleteing Sala {ex.Message}",
+                    Content = $"Error Deleting Sala: {ex.Message}",
                     CloseButtonText = "Ok"
                 };
                 await errorDialog.ShowAsync();

@@ -14,7 +14,7 @@
             <NavigationViewItem Icon="Calendar"  Content="Create Event" Tag="CreateEventPage">
             </NavigationViewItem>
             <NavigationViewItem Icon="List" Content="Events" Tag="EventsPage"/>
-            <NavigationViewItem Icon="Library" Content="Auditoriums" Tag="AuditoriumList"/>
+            <NavigationViewItem Icon="Map" Content="Auditoriums" Tag="AuditoriumList"/>
 
         </NavigationView.MenuItems>
         <Frame x:Name="contentFrame"/>

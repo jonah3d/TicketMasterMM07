@@ -1153,7 +1153,7 @@ where Evt_Name like @name";
         }
 
 
-        private Boolean checkSalaZones(int salaid)
+        public Boolean checkSalaZones(int salaid)
         {
             Boolean ans = false;
             int count = 0;
@@ -1178,7 +1178,7 @@ where Evt_Name like @name";
                             {
                                 if (reader.Read())
                                 {
-                                    count = reader.GetInt32(reader.GetOrdinal("Zone_Count"));
+                                    count = reader.GetInt32(reader.GetOrdinal("ZoneCount"));
                                     if(count > 0)
                                     {
                                         ans = true;
@@ -1203,52 +1203,62 @@ where Evt_Name like @name";
 
         }
 
-
         public bool DeleteAllSalaZones(int salaid)
         {
             try
             {
                 if (checkSalaZones(salaid))
                 {
-                    using (MySQLDBContext context = new MySQLDBContext())
-                    {
 
-                        using (var connection = context.Database.GetDbConnection())
+                    List<int> zoneIds = ZoneIds(salaid);
+
+
+
+
+                    if (DeleteAllChairZones(zoneIds)) { 
+
+                        using (MySQLDBContext context = new MySQLDBContext())
                         {
-                            connection.Open();
-                            if (connection.State != System.Data.ConnectionState.Open)
-                            {
-                                throw new Exception("Can't Open Connection");
-                            }
 
-                            using (var transaction = connection.BeginTransaction())
+                            using (var connection = context.Database.GetDbConnection())
                             {
-                                try
+                                connection.Open();
+                                if (connection.State != System.Data.ConnectionState.Open)
                                 {
-                                    using (var consulta = connection.CreateCommand())
-                                    {
-                                        consulta.Transaction = transaction;
-
-                                        consulta.Parameters.Clear();
-                                        consulta.CommandText = @"delete from zone where Zone_Sal_Id = @salid";
-                                        consulta.Parameters.Add(new MySqlParameter("@salid", salaid));
-                                        consulta.ExecuteNonQuery();
-
-                                    }
-                                    transaction.Commit();
-                                    return true;
+                                    throw new Exception("Can't Open Connection");
                                 }
-                                catch (Exception ex)
+
+                                using (var transaction = connection.BeginTransaction())
                                 {
-                                    transaction.Rollback();
-                                    throw new Exception($"Can't Delete Zones {ex.Message}");
+                                    try
+                                    {
+                                        using (var consulta = connection.CreateCommand())
+                                        {
+                                            consulta.Transaction = transaction;
+
+                                            consulta.Parameters.Clear();
+                                            consulta.CommandText = @"delete from zone where Zone_Sal_Id = @salid";
+                                            consulta.Parameters.Add(new MySqlParameter("@salid", salaid));
+                                            consulta.ExecuteNonQuery();
+
+                                        }
+
+                                        transaction.Commit();
+                                        return true;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        transaction.Rollback();
+                                        throw new Exception($"Can't Delete Zones {ex.Message}");
+                                    }
+
                                 }
 
                             }
 
                         }
-
                     }
+                    return true;
                 }
                 else
                 {
@@ -1261,6 +1271,93 @@ where Evt_Name like @name";
                 throw new Exception($"Can't Delete Zones {e.Message}");
             }
         }
+        
+        public bool DeleteAllChairZones(List<int> zoneIds)
+        {
+            bool ans = false;
+            try
+            {
+                using (MySQLDBContext context = new MySQLDBContext())
+                {
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+                        using (var transaction = connection.BeginTransaction())
+                        {
+                            try
+                            {
+                                using (var consulta = connection.CreateCommand())
+                                {
+                                    
+                                    foreach (int zoneid in zoneIds)
+                                    {
+                                        consulta.Transaction = transaction;
+                                        consulta.Parameters.Clear();
+                                        consulta.CommandText = @"delete from seat where seat_ZoneId = @zoneid";
+                                        consulta.Parameters.Add(new MySqlParameter("@zoneid", zoneid));
+                                        consulta.ExecuteNonQuery();
+                                    }
+
+
+                                }
+                                transaction.Commit();
+                                ans = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                transaction.Rollback();
+                                throw new Exception($"Can't Delete Chairs {ex.Message}");
+                            }
+                        }
+                    }
+                }
+                return ans;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Can't Delete Chairs {e.Message}");
+            }
+        }
+
+         public  List<int> ZoneIds(int salaid)
+         {
+            var list = new List<int>();
+            try
+            {
+                using (MySQLDBContext context = new MySQLDBContext())
+                {
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"SELECT Zone_Id FROM zone WHERE Zone_Sal_Id = @SalaId";
+                            consulta.Parameters.Add(new MySqlParameter("@SalaId", salaid));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    list.Add(reader.GetInt32(reader.GetOrdinal("Zone_Id")));
+                                }
+                            }
+                        }
+                    }
+                }
+                return list;
+            }
+                catch (Exception e)
+                {
+                    throw new Exception($"Can't Get Zone Ids {e.Message}");
+                }
+         }
     }
 }
 
