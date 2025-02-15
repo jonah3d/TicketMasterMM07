@@ -88,7 +88,7 @@ namespace TM_View.View
                 {
                     bool hasZones = eventRepository.checkSalaZones((int)selectedSala.Id);
 
-                    // If it has zones, delete them first
+                 
                     if (hasZones)
                     {
                         bool zonesDeleted = eventRepository.DeleteAllSalaZones((int)selectedSala.Id);
@@ -105,7 +105,7 @@ namespace TM_View.View
                         }
                     }
 
-                    // Now try to delete the sala
+               
                     if (eventRepository.DeleteSala(selectedSala))
                     {
                         ContentDialog successContent = new ContentDialog
@@ -150,7 +150,22 @@ namespace TM_View.View
 
         private void Btn_EditSala_Click(object sender, RoutedEventArgs e)
         {
+            selectedSala = Dg_Salas.SelectedItem as Sala;
+            if (selectedSala != null)
+            {
+                var mainPage = Window.Current.Content as Frame;
+                if (mainPage != null)
+                {
+                    var navView = (mainPage.Content as MainPage)?.FindName("contentFrame") as Frame;
+                    if (navView != null)
+                    {
+                        navView.Navigate(typeof(EdicionSala), selectedSala);
+                    }
+                }
+            }
 
         }
+
+ 
     }
 }

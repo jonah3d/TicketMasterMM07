@@ -129,6 +129,9 @@
     <Compile Include="View\CreacionSala.xaml.cs">
       <DependentUpon>CreacionSala.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\EdicionSala.xaml.cs">
+      <DependentUpon>EdicionSala.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\EditEvent.xaml.cs">
       <DependentUpon>EditEvent.xaml</DependentUpon>
     </Compile>
@@ -187,6 +190,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CreateEventPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\EdicionSala.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

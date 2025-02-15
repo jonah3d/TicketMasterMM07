@@ -20,7 +20,8 @@ namespace TM_Database.Repository
         ObservableCollection<Event> GetAllArtsEvent();
         ObservableCollection<Event> GetAllOtherEvent();
         ObservableCollection<Sala> GetAllSalas();
-        
+        ObservableCollection<Zona> GetAllZonesFromSala(long salaid);
+
         Event GetEventByName(string name);
 
         Boolean CreateEvent(Event e);
@@ -28,6 +29,7 @@ namespace TM_Database.Repository
         Boolean UpdateEvent(Event e);
         Boolean CreateSala(Sala s);
         Boolean DeleteSala(Sala s);
+        Boolean EditSala(Sala s);
 
         Boolean CreateZone(ObservableCollection<Zona>z, int salaid);
         Boolean DeleteAllSalaZones(int salaid);

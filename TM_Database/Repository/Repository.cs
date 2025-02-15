@@ -166,6 +166,9 @@ namespace TM_Database.Repository
             }
         }
 
+
+
+
         public bool CreateZone(ObservableCollection<Zona> z, int salaid)
         {
             if (z == null)
@@ -1383,7 +1386,7 @@ where Evt_Name like @name";
 
                                     foreach (var zone in zones)
                                     {
-                                        // Get the Zone_Id for this zone - assuming it was just created
+                                       
                                         command.Parameters.Clear();
                                         command.CommandText = "SELECT Zone_Id FROM zone WHERE Zone_Name = @zoneName AND Zone_Color = @zoneColor";
                                         command.Parameters.Add(new MySqlParameter("@zoneName", zone.Nom));
@@ -1402,7 +1405,7 @@ where Evt_Name like @name";
                                             }
                                         }
 
-                                        // Insert each seat for this zone
+                                      
                                         foreach (var seat in zone.Cadires)
                                         {
                                             command.Parameters.Clear();
@@ -1410,7 +1413,7 @@ where Evt_Name like @name";
                                         INSERT INTO seat (Seat_Description, Seat_X, Seat_Y, Seat_ZoneId)
                                         VALUES (@description, @x, @y, @zoneId)";
 
-                                            string seatDescription = $"{(char)('A' + seat.Y)}{seat.X + 1}"; // e.g., A1, B2, etc.
+                                            string seatDescription = $"{(char)('A' + seat.Y)}{seat.X + 1}";
 
                                             command.Parameters.Add(new MySqlParameter("@description", seatDescription));
                                             command.Parameters.Add(new MySqlParameter("@x", seat.X));
@@ -1437,6 +1440,125 @@ where Evt_Name like @name";
             catch (Exception ex)
             {
                 throw new Exception($"Error in CreateSeats: {ex.Message}");
+            }
+        }
+
+        public bool EditSala(Sala s)
+        {
+            if (s == null)
+            {
+                throw new Exception(" Can't Pass A Null Sala");
+            }
+
+            string name = s.Nom;
+            string municipi = s.Municipi;
+            string adreca = s.Adreca;
+            bool teMapa = s.TeMapa;
+            int totalSeats = s.Seats;
+            int numFiles = s.NumFiles;
+            int numColumnes = s.NumColumnes;
+
+            try
+            {
+
+                using (MySQLDBContext context = new MySQLDBContext())
+                {
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+                        using (var transaction = connection.BeginTransaction())
+                        {
+                            try
+                            {
+                                using (var consulta = connection.CreateCommand())
+                                {
+                                    consulta.Transaction = transaction;
+                                    consulta.CommandText = @"update sala  set 
+                                                        Sal_Name = @name,
+                                                        Sal_Municipality = @municipi, 
+                                                        Sal_Address = @adreca,
+                                                        Sal_MapAvail =  @teMapa, 
+                                                        Sal_Seats = @totalSeats,
+                                                        Sal_Rows = @numFiles,
+                                                        Sal_Col =  @numColumnes
+                                                       where sal_Id = @id";
+
+                                    consulta.Parameters.Add(new MySqlParameter("@name", name));
+                                    consulta.Parameters.Add(new MySqlParameter("@municipi", municipi));
+                                    consulta.Parameters.Add(new MySqlParameter("@adreca", adreca));
+                                    consulta.Parameters.Add(new MySqlParameter("@teMapa", teMapa));
+                                    consulta.Parameters.Add(new MySqlParameter("@totalSeats", totalSeats));
+                                    consulta.Parameters.Add(new MySqlParameter("@numFiles", numFiles));
+                                    consulta.Parameters.Add(new MySqlParameter("@numColumnes", numColumnes));
+                                    consulta.Parameters.Add(new MySqlParameter("@id", s.Id));
+                                    consulta.ExecuteNonQuery();
+                                }
+                                transaction.Commit();
+                                return true;
+                            }
+                            catch (Exception ex)
+                            {
+                                transaction.Rollback();
+                                throw new Exception($"Can't Edit Sala {ex.Message}");
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error Editing Sala {e.Message}");
+
+            }
+        }
+
+        public ObservableCollection<Zona> GetAllZonesFromSala(long salaid)
+        {
+            ObservableCollection<Zona> zones = null;
+            try
+            {
+                using (MySQLDBContext context = new MySQLDBContext())
+                {
+                    using (var connection = context.Database.GetDbConnection())
+                    {
+                        connection.Open();
+                        if (connection.State != System.Data.ConnectionState.Open)
+                        {
+                            throw new Exception("Can't Open Connection");
+                        }
+                        using (var consulta = connection.CreateCommand())
+                        {
+                            consulta.CommandText = @"SELECT Zone_Id, Zone_Name, Zone_Color, Zone_Capacity 
+                                                FROM zone WHERE Zone_Sal_Id = @SalaId";
+                            consulta.Parameters.Add(new MySqlParameter("@SalaId",(int) salaid));
+                            using (var reader = consulta.ExecuteReader())
+                            {
+                                zones = new ObservableCollection<Zona>();
+                                while (reader.Read())
+                                {
+                                    int zoneId = reader.GetInt32(reader.GetOrdinal("Zone_Id"));
+                                    string zoneName = reader.GetString(reader.GetOrdinal("Zone_Name"));
+                                    string zoneColor = reader.GetString(reader.GetOrdinal("Zone_Color"));
+                                    System.Drawing.Color color = ConvertFromHex(zoneColor);
+                                    int capacity = reader.GetInt32(reader.GetOrdinal("Zone_Capacity"));
+                                    Zona z = new Zona((long)zoneId,zoneName,capacity,color);
+                                    zones.Add(z);
+                                }
+                            }
+                        }
+                    }
+                }
+                return zones;
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Can't Get Zones {e.Message}");
             }
         }
     }

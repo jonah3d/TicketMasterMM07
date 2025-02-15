@@ -27,5 +27,14 @@ namespace TM_Model
             this.Cadires = new List<Cadira>();
         }
 
+        public Zona (long id, string nom, int capacitat, Color color)
+        {
+            this.Id = id;
+            this.Nom = nom;
+          
+            this.Capacitat = capacitat;
+            this.Z_Color = color;
+            this.Cadires = new List<Cadira>();
+        }
     }
 }

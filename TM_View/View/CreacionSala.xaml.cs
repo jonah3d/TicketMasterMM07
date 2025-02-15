@@ -213,7 +213,7 @@ namespace TM_View.View
             {
                 int row = -1, col = -1;
 
-                // Find the position of the clicked button
+               
                 for (int i = 0; i < seatButtons.GetLength(0); i++)
                 {
                     for (int j = 0; j < seatButtons.GetLength(1); j++)
@@ -461,7 +461,7 @@ namespace TM_View.View
                         {
                             if (repository.CreateZone(zones, newSalaId))
                             {
-                                // Add this new code to create seats after zones are created
+                               
                                 if (repository.CreateSeats(zones))
                                 {
                                     ContentDialog successcontent = new ContentDialog
@@ -474,7 +474,7 @@ namespace TM_View.View
                                 }
                                 else
                                 {
-                                    // If CreateSeats fails, attempt to clean up
+                                  
                                     if (repository.DeleteAllSalaZones(newSalaId) && repository.DeleteSala(sala))
                                     {
                                         ContentDialog errorDialog = new ContentDialog
@@ -493,7 +493,7 @@ namespace TM_View.View
                             }
                             else
                             {
-                                // If CreateZone fails, delete Sala immediately
+                             
                                 if (repository.DeleteSala(sala))
                                 {
                                     ContentDialog errorDialog = new ContentDialog
@@ -512,7 +512,7 @@ namespace TM_View.View
                         }
                         catch (Exception ex)
                         {
-                            // Clean up attempt if any step fails
+                            
                             repository.DeleteAllSalaZones(newSalaId);
                             if (repository.DeleteSala(sala))
                             {
