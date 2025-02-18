@@ -1144,8 +1144,8 @@ where Evt_Name like @name";
             }
 
             int r = int.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
-            int g = int.Parse(hex.Substring(2, 4), System.Globalization.NumberStyles.HexNumber);
-            int b = int.Parse(hex.Substring(4, 6), System.Globalization.NumberStyles.HexNumber);
+            int g = int.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber); // Fixed: take 2 characters
+            int b = int.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber); // Fixed: take 2 characters
 
             return System.Drawing.Color.FromArgb(r, g, b);
         }

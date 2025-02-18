@@ -32,12 +32,14 @@ namespace TM_View.View
         private Button[,] seatButtons;
         private static SolidColorBrush grey = new SolidColorBrush(Windows.UI.Colors.LightGray);
         private Zona selectedZone;
+       
 
         public EdicionSala()
         {
             this.InitializeComponent();
             InitializeControls();
             repository = new Repository();
+            Lv_ZonaList.ItemsSource = zones;
 
             this.DataContext = this;
 
@@ -49,6 +51,7 @@ namespace TM_View.View
 
             if(e.Parameter is Sala selectedSala)
             {
+        
                 selectedSal = selectedSala;
                 if (selectedSala.TeMapa)
                 {
@@ -57,11 +60,19 @@ namespace TM_View.View
                     Tb_SalAdreca.Text = selectedSala.Adreca;
                     Tg_Map.IsOn = selectedSala.TeMapa;
                     Tb_SalaCapacity.Text = selectedSala.Seats.ToString();
-                    Cmb_SalaCol.SelectedIndex = selectedSala.NumColumnes;
-                    Cmb_SalaRow.SelectedIndex = selectedSala.NumFiles;
+
+                    int column = selectedSala.NumColumnes;
+                    int row = selectedSala.NumFiles;
+
+                    Cmb_SalaCol.SelectedIndex = column;
+                    Cmb_SalaRow.SelectedIndex = row;
+                    
 
                     zones.Clear();
-                    zones = repository.GetAllZonesFromSala(selectedSala.Id);
+                    foreach (var zone in repository.GetAllZonesFromSala(selectedSala.Id))
+                    {
+                        zones.Add(zone);
+                    }
 
                 }
                 else if(!selectedSala.TeMapa)
@@ -85,7 +96,7 @@ namespace TM_View.View
         {
             Tg_Map.IsOn = true;
 
-            for (int i = 1; i <= 100; i++)
+            for (int i = 0; i <= 100; i++)
             {
                 Cmb_SalaRow.Items.Add(i);
                 Cmb_SalaCol.Items.Add(i);
@@ -100,6 +111,8 @@ namespace TM_View.View
             Lv_ZonaList.SelectionChanged += Lv_ZonaList_SelectionChanged;
             Btn_PaintZone.Click += Btn_PaintZone_Click;
             Btn_EraseZone.Click += Btn_EraseZone_Click;
+
+          
 
 
             UpdateSeatingGrid(null, null);
@@ -208,9 +221,127 @@ namespace TM_View.View
             }
         }
 
-        private void Btn_EditAuditoriumSala_Click(object sender, RoutedEventArgs e)
+        private async void Btn_EditAuditoriumSala_Click(object sender, RoutedEventArgs e)
         {
+            var salaname = Tb_salaname.Text;
+            var salamunicipi = Tb_SalMunicipi.Text;
+            var salaadreca = Tb_SalAdreca.Text;
+            var map = Tg_Map.IsOn;
+            var totalsalacapacity = Int32.Parse(Tb_SalaCapacity.Text);
+            var numfiles = Int32.Parse(Cmb_SalaRow.SelectedItem.ToString());
+            var numcolumnes = Int32.Parse(Cmb_SalaCol.SelectedItem.ToString());
 
+            if (map == false)
+            {
+                totalsalacapacity = 0;
+                numfiles = 0;
+                numcolumnes = 0;
+            }
+
+            try
+            {
+                Sala sala = new Sala
+                {
+                    Id = selectedSal.Id,
+                    Nom = salaname,
+                    Municipi = salamunicipi,
+                    Adreca = salaadreca,
+                    TeMapa = map,
+                    Seats = totalsalacapacity,
+                    NumFiles = numfiles,
+                    NumColumnes = numcolumnes,
+                };
+
+               
+                if (repository.EditSala(sala))
+                {
+                    try
+                    {
+                      
+                        if (repository.DeleteAllSalaZones((int)selectedSal.Id))
+                        {
+                            try
+                            {
+                                
+                                if (repository.CreateZone(zones, (int)selectedSal.Id))
+                                {
+                                    
+                                    ContentDialog successDialog = new ContentDialog
+                                    {
+                                        Title = "Success",
+                                        Content = $"Successfully edited sala {sala.Nom} with new zones",
+                                        CloseButtonText = "Ok"
+                                    };
+                                    await successDialog.ShowAsync();
+                                }
+                                else
+                                {
+                                    
+                                    throw new Exception("Failed to create new zones");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                               
+                                repository.EditSala(selectedSal);
+                                ContentDialog errorDialog = new ContentDialog
+                                {
+                                    Title = "Error",
+                                    Content = $"Failed to create new zones. Changes reverted. Error: {ex.Message}",
+                                    CloseButtonText = "Ok"
+                                };
+                                await errorDialog.ShowAsync();
+                            }
+                        }
+                        else
+                        {
+                            
+                            repository.EditSala(selectedSal); 
+                            ContentDialog errorDialog = new ContentDialog
+                            {
+                                Title = "Error",
+                                Content = "Failed to delete existing zones. Changes reverted.",
+                                CloseButtonText = "Ok"
+                            };
+                            await errorDialog.ShowAsync();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                      
+                        repository.EditSala(selectedSal);
+                        ContentDialog errorDialog = new ContentDialog
+                        {
+                            Title = "Error",
+                            Content = $"Error during zone operations. Changes reverted. Error: {ex.Message}",
+                            CloseButtonText = "Ok"
+                        };
+                        await errorDialog.ShowAsync();
+                    }
+                }
+                else
+                {
+                    
+                    ContentDialog errorDialog = new ContentDialog
+                    {
+                        Title = "Error",
+                        Content = "Failed to edit sala information",
+                        CloseButtonText = "Ok"
+                    };
+                    await errorDialog.ShowAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+              
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"Error editing sala: {ex.Message}",
+                    CloseButtonText = "Ok"
+                };
+                await errorDialog.ShowAsync();
+            }
         }
 
         private void Tg_Map_Toggled(object sender, RoutedEventArgs e)
@@ -246,36 +377,82 @@ namespace TM_View.View
 
         private void Btn_PaintZone_Click(object sender, RoutedEventArgs e)
         {
-
+            isPaintMode = true;
+            ZonaColorPicker.Color = currentUIColor;
         }
 
         private void Btn_EraseZone_Click(object sender, RoutedEventArgs e)
         {
-
+            isPaintMode = false;
+            currentUIColor = Windows.UI.Colors.LightGray;
+            ZonaColorPicker.Color = currentUIColor;
         }
 
         private void ZonaColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
         {
-
+            currentUIColor = args.NewColor;
+            Btn_ColorBrush.Color = currentUIColor;
         }
 
         private void Btn_ClearColorSel_Click(object sender, RoutedEventArgs e)
         {
-
+            Tb_ZonaName.Text = "";
+            Tb_ZonaCapacity.Text = "";
+            currentUIColor = Windows.UI.Colors.Gray;
+            Btn_ColorBrush.Color = currentUIColor;
+            Btn_ColorPicker.Background = new SolidColorBrush(currentUIColor);
+            Lv_ZonaList.SelectedItem = null;
+            selectedZone = null;
         }
 
         private void Btn_AddZona_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(Tb_ZonaName.Text)) return;
 
+            int capacity = Int32.Parse(Tb_ZonaCapacity.Text);
+            var drawingColor = ConvertToDrawingColor(currentUIColor);
+
+            var zone = new Zona(
+                Tb_ZonaName.Text,
+                capacity,
+                drawingColor
+            );
+
+            zones.Add(zone);
         }
 
         private void Btn_DelZona_Click(object sender, RoutedEventArgs e)
         {
+            if (Lv_ZonaList.SelectedItem is Zona selectedZone)
+            {
+                var uiColor = ConvertToUIColor(selectedZone.Z_Color);
 
+
+                foreach (var button in seatButtons)
+                {
+                    if (((SolidColorBrush)button.Background).Color == uiColor)
+                    {
+                        button.Background = new SolidColorBrush(Windows.UI.Colors.LightGray);
+                    }
+                }
+
+                zones.Remove(selectedZone);
+
+                UpdateTotalCapacity();
+            }
         }
 
         private void Lv_ZonaList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (Lv_ZonaList.SelectedItem is Zona zona)
+            {
+                selectedZone = zona;
+            }
+
+            Tb_ZonaName.Text = selectedZone.Nom;
+            Tb_ZonaCapacity.Text = selectedZone.Capacitat.ToString();
+            ZonaColorPicker.Color = ConvertToUIColor(selectedZone.Z_Color);
+            Btn_ColorPicker.Background = new SolidColorBrush(ConvertToUIColor(selectedZone.Z_Color));
 
         }
 
@@ -355,7 +532,7 @@ namespace TM_View.View
             {
                 int row = -1, col = -1;
 
-                // Find the position of the clicked button
+              
                 for (int i = 0; i < seatButtons.GetLength(0); i++)
                 {
                     for (int j = 0; j < seatButtons.GetLength(1); j++)
