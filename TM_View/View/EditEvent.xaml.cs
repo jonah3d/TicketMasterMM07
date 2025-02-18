@@ -27,6 +27,7 @@ namespace TM_View.View
     {
         private IRepository eventRepository;
         private ObservableCollection<Sala> salas { get; set; } = new ObservableCollection<Sala>();
+        private ObservableCollection<Zona> zona { get; set; } = new ObservableCollection<Zona>();
         private int EventId;
         public EditEvent()
         {
@@ -35,6 +36,8 @@ namespace TM_View.View
             cmb_status.ItemsSource = Enum.GetValues(typeof(Estat));
             cmb_type.ItemsSource = Enum.GetValues(typeof(TipusEvent));
             cmb_sala.ItemsSource = salas;
+            Lv_EventsZona.ItemsSource = zona;
+          
             loadSalas();
 
             this.DataContext = this;
@@ -169,6 +172,11 @@ namespace TM_View.View
         private  async void Btn_EditEvent_Click(object sender, RoutedEventArgs e)
         {
           await  updateEvent();
+
+        }
+
+        private void Lv_EventsZona_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
 
         }
     }

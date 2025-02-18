@@ -6,7 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+     xmlns:z="using:TM_View.Convertors"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <z:ColorToSolidColorBrushConverter x:Key="ColorToSolidColorBrushConverter"/>
+    </Page.Resources>
 
     <Grid>
 
@@ -75,17 +80,29 @@
 
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" Grid.Column="1" >
+        <StackPanel Orientation="Vertical" Grid.Column="1" Margin="20">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Tarifa Nom:" FontSize="24" FontWeight="Bold"/>
                 <TextBox  Width="200" Margin="50,0,0,0" x:Name="Tb_nom"/>
                 <TextBlock Text="Tarifa Price:" FontSize="24" FontWeight="Bold" Margin="20,0,0,0"/>
                 <TextBox  Width="200" Margin="20,0,0,0" x:Name="Tb_price"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
                 <TextBlock Text="Desc:" FontSize="24" FontWeight="Bold"/>
-                <TextBox  Width="200" Height="200" Margin="120,0,0,0" x:Name="Tb_desc" TextWrapping="Wrap"/>
+                <TextBox  Width="580" Margin="120,0,0,0" x:Name="Tb_desc" TextWrapping="Wrap"/>
             </StackPanel>
+            <TextBlock Text="Event Zones" FontSize="24" FontWeight="Bold" Margin="0,20,0,0"/>
+
+            <ListView x:Name="Lv_EventsZona" SelectionChanged="Lv_EventsZona_SelectionChanged" Width="300" Margin="0,20,0,0" Height="200" HorizontalAlignment="Left">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Nom}"/>
+                            <Rectangle Width="25" Height="25" Fill="{Binding Z_Color,Converter={StaticResource ColorToSolidColorBrushConverter}}" Margin="20,0,0,0" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
             
         </StackPanel>
 
